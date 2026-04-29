@@ -1,0 +1,148 @@
+flowchart TD
+
+%% ========================
+%% START & LOGIN
+%% ========================
+A[Start] --> B[Login Page]
+B --> C[Enter Username & Password]
+C --> D{Valid Credentials?}
+
+D -- No --> B
+D -- Yes --> E{User Role}
+
+%% ========================
+%% DATABASE
+%% ========================
+subgraph DATABASE
+    DB1[(Users)]
+    DB2[(Riders)]
+    DB3[(Address)]
+    DB4[(Parcel)]
+end
+
+C --> DB1
+
+%% ========================
+%% ADMIN FLOW
+%% ========================
+E -- Admin --> F[Admin Menu]
+
+F --> F1[Parcel Management]
+F --> F2[Rider Management]
+F --> F3[Address Management]
+F --> F4[Generate Sorting]
+
+%% Parcel CRUD
+F1 --> G1[Create Parcel]
+F1 --> G2[View Parcel List]
+F1 --> G3[Update Parcel Status]
+F1 --> G4[Delete Parcel]
+
+%% Address
+F3 --> H1[Add Predefined Address]
+F3 --> H2[Update Address]
+
+H1 --> DB3
+H2 --> DB3
+
+%% Rider
+F2 --> I1[View Rider Info]
+F2 --> I2[Assign Rider]
+
+I2 --> DB2
+
+%% ========================
+%% PARCEL INPUT FLOW
+%% ========================
+G1 --> K[Select Address Dropdown]
+K --> DB3
+K --> L[Get Address ID]
+
+L --> M[Insert Parcel Data]
+M --> DB4
+
+%% ========================
+%% RIDER FLOW
+%% ========================
+E -- Rider --> J[Rider Menu]
+
+J --> J1[View Sorted Parcel List]
+J --> J2[Update Parcel Status]
+
+%% ========================
+%% UPDATE STATUS FLOW (FIXED 🔥)
+%% ========================
+G3 --> U1[Select Parcel]
+J2 --> U1
+
+U1 --> U2[View Current Status]
+U2 --> U3[Choose New Status]
+
+U3 --> U4{Valid Transition?}
+
+U4 -- No --> U5[Reject Update]
+U4 -- Yes --> U6[Update Status in System]
+
+%% 🔥 IMPORTANT CONNECTION TO DATABASE
+U6 --> DB4
+
+U6 --> U7{Status = Delivered?}
+
+U7 -- Yes --> U8[Update time_out]
+U8 --> DB4
+
+U7 -- No --> U9[Keep Active]
+
+%% ========================
+%% SORTING TRIGGER
+%% ========================
+F4 --> S1[Trigger Sorting]
+J1 --> S1
+U8 --> S1
+U9 --> S1
+M --> S1
+
+%% ========================
+%% SORTING PROCESS
+%% ========================
+S1 --> S2[Retrieve Parcels]
+S2 --> DB4
+
+S2 --> S3[Filter status != Delivered]
+
+S3 --> S4[Join Address Data]
+S4 --> DB3
+
+S4 --> S5[Check Delivery Type]
+S4 --> S6[Get House Number]
+
+S5 --> S7[Fast Delivery Group]
+S5 --> S8[Standard Delivery Group]
+
+S7 --> S9[Sort Fast by House Number ASC]
+S8 --> S10[Sort Standard by House Number ASC]
+
+S9 --> S11[Combine Lists]
+S10 --> S11
+
+S11 --> S12[Generate Sorted Queue]
+
+%% ========================
+%% OUTPUT
+%% ========================
+S12 --> O1[Display Sorted List (Admin)]
+S12 --> O2[Display Sorted List (Rider)]
+
+%% ========================
+%% RIDER DELIVERY FLOW
+%% ========================
+O2 --> R1[Out for Delivery]
+R1 --> R2[Delivered]
+
+R2 --> U6
+
+%% ========================
+%% END
+%% ========================
+O1 --> Z[End]
+R2 --> Z
