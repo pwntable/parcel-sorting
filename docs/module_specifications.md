@@ -425,6 +425,22 @@ These are **internal helper functions** used by the display functions above.
 | **Returns** | `1` if valid integer read, `0` otherwise |
 | **LL Interaction** | **None** |
 
+### `clear_screen`
+
+| Attribute | Detail |
+|-----------|--------|
+| **Signature** | `void clear_screen(void)` |
+| **Parameters** | `None` |
+| **Returns** | `void` |
+| **Responsibility** | Clears the terminal screen. Uses `cls` for Windows and `clear` for Linux/macOS. |
+| **LL Interaction** | **None** |
+
+**Example Usage:**
+```c
+clear_screen();
+printf("=== MAIN MENU ===\n");
+```
+
 ---
 
 ## 5. Database Module (`database.c`) — Piki

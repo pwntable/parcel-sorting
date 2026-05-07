@@ -18,6 +18,7 @@
 - Define all shared data structures (structs)
 - Implement the linked list utility (`parcel_list.c` / `parcel_list.h`)
 - Create stub header files for all modules
+- Implement `clear_screen` utility in `validation.c`
 - Set up `main.c` with basic menu skeleton
 
 ### Deliverables
@@ -347,6 +348,7 @@ int validate_delivery_type(const char *type);
 void trim_whitespace(char *str);
 int safe_read_string(char *buffer, int size);
 int safe_read_int(int *result);
+void clear_screen(void);
 
 #endif
 ```
