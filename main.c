@@ -1,14 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "validation.h"
 #include <sqlite3.h>
-#include "db_setup.h"
-
+#include "../include/validation.h"
+#include "../include/database.h"
 
 int main() {
 
     sqlite3 *db = NULL;
     int rc;
+
     clear_screen();
     
     printf("=========================================\n");
@@ -32,12 +32,10 @@ int main() {
     // TODO: Put your main menu function here later
     // For example: main_menu(db);
 
-
     printf("\nPress Enter to exit...");
-    
     getchar();
 
-    //=======================================================
+    // Close database before exit
     sqlite3_close(db);
     return 0;
 }

@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sqlite3.h>
-#include "db_setup.h"
+#include "../include/database.h"
 
 #define DB_FILE "parcel_system.db"
 
