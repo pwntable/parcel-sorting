@@ -1,114 +1,98 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sqlite3.h>
 #include "../include/database.h"
+#include "../include/parcel_list.h"
+#include <stdio.h>
+#include <string.h>
 
-#define DB_FILE "parcel_system.db"
+// Initialize with mocked data so we don't rely on text files or SQLite for now
+void init_mock_database(ParcelNode **head, User users[], int *user_count,
+                        Address addresses[], int *address_count) {
+  // 1. Mock Users
+  users[0].user_id = 1;
+  strcpy(users[0].username, "admin");
+  strcpy(users[0].password, "admin123");
+  users[0].role = ROLE_ADMIN;
+  users[0].assigned_address_id = 0; // N/A (NULL) for Admin
 
-// Data Structures
-typedef struct {
-    int uid;
-    char role[20];
-    char username[50];
-    char password[100];
-} User;
+  users[1].user_id = 2;
+  strcpy(users[1].username, "rider1");
+  strcpy(users[1].password, "rider123");
+  users[1].role = ROLE_RIDER;
+  users[1].assigned_address_id = 101; // Mandatory assigned to Jalan Tun Razak
 
-typedef struct {
-    int rider_id;
-    int uid;
-    char name[100];
-    char transport[50];
-} Rider;
+  *user_count = 2;
 
-typedef struct {
-    int address_id;
-    char lot[30];
-    char street[100];
-} Address;
+  // 2. Mock Addresses
+  addresses[0].address_id = 101;
+  strcpy(addresses[0].street, "Jalan Tun Razak");
+  strcpy(addresses[0].city, "Kuala Lumpur");
+  strcpy(addresses[0].state, "WP Kuala Lumpur");
+  addresses[0].house_number = 0; // Reference if needed
 
-typedef struct {
-    int parcel_id;
-    char customer_name[100];
-    int address_id;
-    char time_in[30];
-    char time_out[30];
-    char parcel_type[20];
-    int rider_id;
-    char status[30];
-} Parcel;
+  addresses[1].address_id = 102;
+  strcpy(addresses[1].street, "Jalan Ampang");
+  strcpy(addresses[1].city, "Kuala Lumpur");
+  strcpy(addresses[1].state, "WP Kuala Lumpur");
+  addresses[1].house_number = 0;
 
-// Helper to print SQLite error
-void print_error(sqlite3 *db, const char *message) {
-    fprintf(stderr, "%s: %s\n", message, sqlite3_errmsg(db));
+  *address_count = 2;
+
+  // 3. Mock Parcels
+  Parcel p1;
+  p1.parcel_id = 1;
+  strcpy(p1.sender_name, "Ali");
+  strcpy(p1.receiver_name, "Abu");
+  p1.address_id = 101;
+  strcpy(p1.delivery_type, "Fast");
+  strcpy(p1.status, "Pending");
+  p1.house_number = 12;
+  strcpy(p1.time_in, "2026-05-13 10:00");
+  strcpy(p1.time_out, "");
+  p1.rider_id = 0; // Unassigned
+
+  Parcel p2;
+  p2.parcel_id = 2;
+  strcpy(p2.sender_name, "Siti");
+  strcpy(p2.receiver_name, "Ahmad");
+  p2.address_id = 102;
+  strcpy(p2.delivery_type, "Standard");
+  strcpy(p2.status, "Pending");
+  p2.house_number = 5;
+  strcpy(p2.time_in, "2026-05-13 11:30");
+  strcpy(p2.time_out, "");
+  p2.rider_id = 0;
+
+  insert_parcel(head, p2);
+  insert_parcel(head, p1);
 }
 
-// Create all tables
-int create_tables(sqlite3 *db) {
-    char *err_msg = NULL;
-    int rc;
-
-    const char *sql[] = {
-        "CREATE TABLE IF NOT EXISTS User ("
-        " UID INTEGER PRIMARY KEY AUTOINCREMENT,"
-        " role TEXT NOT NULL CHECK(role IN ('admin', 'rider')),"
-        " userName TEXT UNIQUE NOT NULL,"
-        " password TEXT NOT NULL"
-        ");",
-
-        "CREATE TABLE IF NOT EXISTS Rider ("
-        " rider_id INTEGER PRIMARY KEY AUTOINCREMENT,"
-        " UID INTEGER UNIQUE NOT NULL,"
-        " name TEXT NOT NULL,"
-        " transport TEXT,"
-        " FOREIGN KEY (UID) REFERENCES User(UID) ON DELETE CASCADE"
-        ");",
-
-        "CREATE TABLE IF NOT EXISTS Address ("
-        " address_id INTEGER PRIMARY KEY AUTOINCREMENT,"
-        " lot TEXT,"
-        " street TEXT NOT NULL"
-        ");",
-
-        "CREATE TABLE IF NOT EXISTS Parcel ("
-        " parcel_id INTEGER PRIMARY KEY AUTOINCREMENT,"
-        " customer_name TEXT NOT NULL,"
-        " address_id INTEGER NOT NULL,"
-        " time_in TEXT NOT NULL,"
-        " time_out TEXT,"
-        " parcel_type TEXT NOT NULL CHECK(parcel_type IN ('normal', 'fast')),"
-        " rider_id INTEGER,"
-        " status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending', 'out_to_delivery', 'delivered')),"
-        " FOREIGN KEY (address_id) REFERENCES Address(address_id),"
-        " FOREIGN KEY (rider_id) REFERENCES Rider(rider_id)"
-        ");"
-    };
-
-    for (int i = 0; i < 4; i++) {
-        rc = sqlite3_exec(db, sql[i], 0, 0, &err_msg);
-        if (rc != SQLITE_OK) {
-            fprintf(stderr, "Error creating table %d: %s\n", i+1, err_msg);
-            sqlite3_free(err_msg);
-            return rc;
-        }
-    }
-
-    printf("✅ All tables created successfully!\n");
-    return SQLITE_OK;
+int load_parcels_from_file(ParcelNode **head, const char *filename) {
+  // Stub: not used when mocking
+  return 0;
 }
 
-// Initialize Database (Open + Create Tables)
-int init_database(sqlite3 **db) {
-    int rc;
+int save_parcels_to_file(ParcelNode *head, const char *filename) {
+  // Stub: not used when mocking
+  return 0;
+}
 
-    rc = sqlite3_open(DB_FILE, db);
-    if (rc != SQLITE_OK) {
-        fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(*db));
-        return rc;
+int load_users(User users[], int max, const char *filename) {
+  // Stub: not used when mocking
+  return 0;
+}
+
+int load_addresses(Address addresses[], int max, const char *filename) {
+  // Stub: not used when mocking
+  return 0;
+}
+
+int get_next_parcel_id(ParcelNode *head) {
+  int max_id = 0;
+  ParcelNode *current = head;
+  while (current != NULL) {
+    if (current->data.parcel_id > max_id) {
+      max_id = current->data.parcel_id;
     }
-
-    sqlite3_exec(*db, "PRAGMA foreign_keys = ON;", 0, 0, NULL);
-    printf("✅ Database opened successfully!\n");
-
-    return create_tables(*db);
+    current = current->next;
+  }
+  return max_id + 1;
 }

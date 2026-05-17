@@ -202,8 +202,8 @@ Total: 2 parcels
 
 ```text
 === CREATE NEW PARCEL ===
-Sender: John Doe
-Receiver: Alice Smith
+Sender: Aiman
+Receiver: Ibad
 
 === SELECT ADDRESS ===
 ------------------------------------------------------------------
@@ -243,6 +243,14 @@ ID | Sender          | Receiver        | Type       | Status       | House# | St
 ## 13. Update Parcel Status
 
 ```text
+--- Current Active Parcels (Sorted) ---
+------------------------------------------------------------------------------------------------------------------------
+ID | Sender          | Receiver        | Type       | Status       | House# | Street          | City         | State
+------------------------------------------------------------------------------------------------------------------------
+1  | Ali             | Abu             | Fast       | Pending      | 12     | Jalan Tun Razak | Kuala Lumpur | WP KL
+2  | Siti            | Ahmad           | Standard   | Pending      | 5      | Jalan Ampang    | Kuala Lumpur | WP KL
+------------------------------------------------------------------------------------------------------------------------
+
 Enter Parcel ID to Update (or press Enter/0 to cancel): 1
 
 === STATUS OPTIONS ===

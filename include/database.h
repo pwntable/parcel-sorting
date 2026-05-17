@@ -1,43 +1,24 @@
 #ifndef DATABASE_H
 #define DATABASE_H
 
-#include <sqlite3.h>
+#include "parcel_list.h"
+#include "login.h"
+#include "address.h"
 
-// ==================== DATA STRUCTURES ====================
-typedef struct {
-    int uid;
-    char role[20];
-    char username[50];
-    char password[100];
-} User;
+// Load/Save parcels (linked list)
+int load_parcels_from_file(ParcelNode **head, const char *filename);
+int save_parcels_to_file(ParcelNode *head, const char *filename);
 
-typedef struct {
-    int rider_id;
-    int uid;
-    char name[100];
-    char transport[50];
-} Rider;
+// Load/Save users (array)
+int load_users(User users[], int max, const char *filename);
 
-typedef struct {
-    int address_id;
-    char lot[30];
-    char street[100];
-} Address;
+// Load/Save addresses (array)
+int load_addresses(Address addresses[], int max, const char *filename);
 
-typedef struct {
-    int parcel_id;
-    char customer_name[100];
-    int address_id;
-    char time_in[30];
-    char time_out[30];
-    char parcel_type[20];
-    int rider_id;
-    char status[30];
-} Parcel;
+// Generate next unique parcel ID
+int get_next_parcel_id(ParcelNode *head);
 
-// ==================== FUNCTION DECLARATIONS ====================
-void print_error(sqlite3 *db, const char *message);
-int create_tables(sqlite3 *db);
-int init_database(sqlite3 **db);
+// Init mock data
+void init_mock_database(ParcelNode **head, User users[], int *user_count, Address addresses[], int *address_count);
 
 #endif
