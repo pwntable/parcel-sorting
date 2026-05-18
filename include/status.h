@@ -1,10 +1,8 @@
 #ifndef STATUS_H
 #define STATUS_H
 
-#include <sqlite3.h>
 #include "parcel_list.h"
 
-int update_parcel_status(sqlite3 *db, int parcel_id, const char *new_status);
 // Update status of a parcel by ID
 int update_parcel_status(ParcelNode **head, int parcel_id, const char *new_status);
 
