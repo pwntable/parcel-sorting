@@ -20,6 +20,12 @@ int is_valid_transition(const char *current_status, const char *new_status) {
     }
 
     return 0;
+void get_current_time(char *buffer, int size) {
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+    snprintf(buffer, size, "%04d-%02d-%02d %02d:%02d",
+             tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday,
+             tm.tm_hour, tm.tm_min);
 }
 
 void display_status_options(void) {
@@ -27,6 +33,10 @@ void display_status_options(void) {
     printf("1. pending\n");
     printf("2. out_to_delivery\n");
     printf("3. delivered\n");
+    printf("Available Statuses:\n");
+    printf("1. Pending\n");
+    printf("2. Out for Delivery\n");
+    printf("3. Delivered\n");
 }
 
 void get_current_time(char *buffer, int size) {
@@ -35,6 +45,9 @@ void get_current_time(char *buffer, int size) {
 
     if (buffer == NULL || size <= 0) {
         return;
+int is_valid_transition(const char *current_status, const char *new_status) {
+    if (strcmp(current_status, "Pending") == 0) {
+        return (strcmp(new_status, "Out for Delivery") == 0 || strcmp(new_status, "Delivered") == 0);
     }
 
     now = time(NULL);
@@ -43,9 +56,12 @@ void get_current_time(char *buffer, int size) {
     if (time_info == NULL) {
         snprintf(buffer, size, "");
         return;
+    if (strcmp(current_status, "Out for Delivery") == 0) {
+        return (strcmp(new_status, "Delivered") == 0);
     }
 
     strftime(buffer, size, "%Y-%m-%d %H:%M:%S", time_info);
+    return 0; // "Delivered" is a terminal state, no outgoing transitions
 }
 
 int update_parcel_status(sqlite3 *db, int parcel_id, const char *new_status) {
@@ -56,15 +72,24 @@ int update_parcel_status(sqlite3 *db, int parcel_id, const char *new_status) {
     char current_status[30];
     char current_time[30];
     int rc;
+int update_parcel_status(ParcelNode **head, int parcel_id, const char *new_status) {
+    ParcelNode *node = find_parcel(*head, parcel_id);
+    if (node == NULL) return 0; // Parcel not found
 
     if (db == NULL || parcel_id <= 0 || new_status == NULL) {
         return 0;
+    if (!is_valid_transition(node->data.status, new_status)) {
+        return -1; // Invalid transition
     }
 
     rc = sqlite3_prepare_v2(db, select_sql, -1, &stmt, NULL);
     if (rc != SQLITE_OK) {
         print_error(db, "Failed to prepare parcel status search");
         return 0;
+    strcpy(node->data.status, new_status);
+    
+    if (strcmp(new_status, "Delivered") == 0) {
+        get_current_time(node->data.time_out, 20);
     }
 
     sqlite3_bind_int(stmt, 1, parcel_id);
@@ -112,6 +137,9 @@ int update_parcel_status(sqlite3 *db, int parcel_id, const char *new_status) {
         print_error(db, "Failed to update parcel status");
         return 0;
     }
+    // Auto-sort after status change to push Delivered parcels to the bottom
+    sort_parcel_list(head);
 
     return 1;
+    return 1; // Success
 }
