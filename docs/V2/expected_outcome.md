@@ -184,3 +184,31 @@ ID    | Street                    | City            | State           | Assigned
 102   | Jalan Ampang              | Kuala Lumpur    | WP Kuala Lumpur | rider2              
 ----------------------------------------------------------------------------------------------------
 ```
+
+---
+
+## 9. View All Parcels (Sorted)
+
+The parcel table now dynamically displays the **Sender** name alongside the receiver.
+
+```text
+=== PARCEL MANAGEMENT ===
+1. View All Parcels (Sorted)
+2. Create New Parcel
+3. Search Parcel
+4. Update Parcel Status
+5. Delete Parcel
+6. Return to Main Menu
+Enter Choice: 1
+
+--- All Parcels (Prioritized) ---
+--------------------------------------------------------------------------------------------------------------------------------------
+ID   | Sender          | Receiver        | Type     | Status       | House# | Street               | City            | State          
+--------------------------------------------------------------------------------------------------------------------------------------
+1    | Ali             | Abu             | Fast     | Pending      | 12     | Jalan Tun Razak      | Kuala Lumpur    | WP Kuala Lumpur
+2    | Siti            | Ahmad           | Standard | Pending      | 5      | Jalan Ampang         | Kuala Lumpur    | WP Kuala Lumpur
+--------------------------------------------------------------------------------------------------------------------------------------
+Total: 2 parcels
+
+Press Enter to continue...
+```

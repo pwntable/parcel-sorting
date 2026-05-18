@@ -3,13 +3,13 @@
 #include "../include/output.h"
 
 void print_divider(void) {
-    printf("---------------------------------------------------------------------------------------------------------------------------\n");
+    printf("--------------------------------------------------------------------------------------------------------------------------------------\n");
 }
 
 void print_table_header(void) {
     print_divider();
-    printf("%-4s | %-15s | %-8s | %-12s | %-6s | %-20s | %-15s | %-15s\n",
-           "ID", "Receiver", "Type", "Status", "House#", "Street", "City", "State");
+    printf("%-4s | %-15s | %-15s | %-8s | %-12s | %-6s | %-20s | %-15s | %-15s\n",
+           "ID", "Sender", "Receiver", "Type", "Status", "House#", "Street", "City", "State");
     print_divider();
 }
 
@@ -23,8 +23,9 @@ void print_table_row(Parcel *parcel, Address addresses[], int addr_count) {
         strncpy(state, addr->state, 15); state[15] = '\0';
     }
 
-    printf("%-4d | %-15.15s | %-8.8s | %-12.12s | %-6d | %-20.20s | %-15.15s | %-15.15s\n",
+    printf("%-4d | %-15.15s | %-15.15s | %-8.8s | %-12.12s | %-6d | %-20.20s | %-15.15s | %-15.15s\n",
            parcel->parcel_id,
+           parcel->sender_name,
            parcel->receiver_name,
            parcel->delivery_type,
            parcel->status,
