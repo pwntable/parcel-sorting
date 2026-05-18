@@ -222,3 +222,35 @@ void display_rider_active_parcels(ParcelNode *head, int assigned_address_id, Add
     printf("Total active (non-delivered) parcels assigned to your road (%s): %d\n", 
            addr ? addr->street : "Unknown", count);
 }
+
+void print_barcode(int parcel_id) {
+    char code_str[10];
+    snprintf(code_str, sizeof(code_str), "%04d", parcel_id);
+    
+    printf("  Barcode Label :\n");
+    for (int line = 0; line < 3; line++) {
+        printf("  ");
+        // Start guard bars
+        printf("█║│");
+        for (int i = 0; i < 4; i++) {
+            int val = code_str[i] - '0';
+            // Print distinct thick/thin bars based on digit
+            switch (val) {
+                case 0: printf("█│║│"); break;
+                case 1: printf("║█│║"); break;
+                case 2: printf("│█║│"); break;
+                case 3: printf("█║│█"); break;
+                case 4: printf("║│█║"); break;
+                case 5: printf("│║█│"); break;
+                case 6: printf("█│█║"); break;
+                case 7: printf("║█│█"); break;
+                case 8: printf("│█│║"); break;
+                case 9: printf("█║█│"); break;
+                default: printf("││││"); break;
+            }
+        }
+        // End guard bars
+        printf("│║█\n");
+    }
+    printf("    *P-%04d*\n", parcel_id);
+}

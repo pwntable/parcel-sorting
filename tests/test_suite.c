@@ -69,9 +69,17 @@ void test_login_and_user_management(void) {
     int reg_fail = register_rider(users, &user_count, "rider2", "rider123", 0);
     assert(reg_fail == -2); // -2 code indicates missing mandatory road assignment
 
+    // 4b. Register Rider with Duplicate Road (should fail with -3)
+    int reg_dup_road = register_rider(users, &user_count, "rider2", "rider123", 101);
+    assert(reg_dup_road == -3); // Already assigned to rider1
+
     // 5. Update User: Admin changing to Rider (must specify valid road)
     int update_to_rider_fail = update_user(users, user_count, 1, "", ROLE_RIDER, 0);
     assert(update_to_rider_fail == -2); // Failed because no road was specified for Rider role
+
+    // 5b. Update User: Admin changing to Rider with duplicate road (should fail with -3)
+    int update_to_rider_dup = update_user(users, user_count, 1, "", ROLE_RIDER, 101);
+    assert(update_to_rider_dup == -3); // 101 is already assigned to rider1
 
     int update_to_rider_ok = update_user(users, user_count, 1, "", ROLE_RIDER, 102);
     assert(update_to_rider_ok == 1);

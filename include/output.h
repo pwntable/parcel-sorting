@@ -19,5 +19,6 @@ void display_rider_parcels(ParcelNode *head, int assigned_address_id, Address ad
 void display_rider_sorted_parcels(ParcelNode *sorted_head, int assigned_address_id, Address addresses[], int addr_count);
 void display_active_parcels(ParcelNode *head, Address addresses[], int addr_count);
 void display_rider_active_parcels(ParcelNode *head, int assigned_address_id, Address addresses[], int addr_count);
+void print_barcode(int parcel_id);
 
 #endif

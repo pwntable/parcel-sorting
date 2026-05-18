@@ -64,6 +64,13 @@ int register_rider(User users[], int *user_count, const char *username, const ch
         if (strcmp(users[i].username, username) == 0) return -1; // Duplicate username
     }
 
+    // Check duplicate road for Riders
+    for (int i = 0; i < *user_count; i++) {
+        if (users[i].role == ROLE_RIDER && users[i].assigned_address_id == assigned_address_id) {
+            return -3; // Road already assigned to another rider
+        }
+    }
+
     // Auto-generate primary key ID (max_id + 1)
     int max_id = 0;
     for (int i = 0; i < *user_count; i++) {
@@ -100,18 +107,29 @@ int update_user(User users[], int user_count, int user_id, const char *new_usern
 
     // Handle role & address assignment
     int final_role = (new_role == -1) ? users[found_idx].role : new_role;
+    int final_assigned_address_id = users[found_idx].assigned_address_id;
+    if (final_role == ROLE_RIDER) {
+        if (new_assigned_address_id > 0) {
+            final_assigned_address_id = new_assigned_address_id;
+        } else if (users[found_idx].assigned_address_id <= 0) {
+            // Rider must have a valid road assigned
+            return -2;
+        }
+
+        // Check duplicate road for other users
+        for (int i = 0; i < user_count; i++) {
+            if (i != found_idx && users[i].role == ROLE_RIDER && users[i].assigned_address_id == final_assigned_address_id) {
+                return -3; // Road already assigned to another rider
+            }
+        }
+    }
     
     if (final_role == ROLE_ADMIN) {
         users[found_idx].role = ROLE_ADMIN;
         users[found_idx].assigned_address_id = 0; // Admin has NULL/0 road
     } else if (final_role == ROLE_RIDER) {
         users[found_idx].role = ROLE_RIDER;
-        if (new_assigned_address_id > 0) {
-            users[found_idx].assigned_address_id = new_assigned_address_id;
-        } else if (users[found_idx].assigned_address_id <= 0) {
-            // Rider must have a valid road assigned
-            return -2;
-        }
+        users[found_idx].assigned_address_id = final_assigned_address_id;
     }
 
     return 1; // Success
@@ -158,4 +176,32 @@ void display_user_list(User users[], int user_count, Address addresses[], int ad
                road_str);
     }
     printf("--------------------------------------------------------------------------------\n");
+}
+
+void display_address_list_with_riders(Address addresses[], int addr_count, User users[], int user_count) {
+    if (addr_count == 0) {
+        printf("No addresses registered.\n");
+        return;
+    }
+
+    printf("----------------------------------------------------------------------------------------------------\n");
+    printf("%-5s | %-25s | %-15s | %-15s | %-20s\n", "ID", "Street", "City", "State", "Assigned Rider");
+    printf("----------------------------------------------------------------------------------------------------\n");
+    for (int i = 0; i < addr_count; i++) {
+        // Find if any rider is assigned to this address
+        char rider_uname[30] = "NULL";
+        for (int j = 0; j < user_count; j++) {
+            if (users[j].role == ROLE_RIDER && users[j].assigned_address_id == addresses[i].address_id) {
+                strcpy(rider_uname, users[j].username);
+                break;
+            }
+        }
+        printf("%-5d | %-25.25s | %-15.15s | %-15.15s | %-20s\n",
+               addresses[i].address_id,
+               addresses[i].street,
+               addresses[i].city,
+               addresses[i].state,
+               rider_uname);
+    }
+    printf("----------------------------------------------------------------------------------------------------\n");
 }

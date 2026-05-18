@@ -36,18 +36,30 @@ int update_address(Address addresses[], int count, int address_id) {
     Address *addr = find_address(addresses, count, address_id);
     if (addr == NULL) return 0;
 
+    char temp[100];
+
     printf("Updating Address ID: %d\n", address_id);
-    printf("Enter New Street (Current: %s): ", addr->street);
-    safe_read_string(addr->street, 100);
-    trim_whitespace(addr->street);
 
-    printf("Enter New City (Current: %s): ", addr->city);
-    safe_read_string(addr->city, 50);
-    trim_whitespace(addr->city);
+    printf("Enter New Street (Current: %s, leave empty to keep): ", addr->street);
+    safe_read_string(temp, 100);
+    trim_whitespace(temp);
+    if (strlen(temp) > 0) {
+        strcpy(addr->street, temp);
+    }
 
-    printf("Enter New State (Current: %s): ", addr->state);
-    safe_read_string(addr->state, 50);
-    trim_whitespace(addr->state);
+    printf("Enter New City (Current: %s, leave empty to keep): ", addr->city);
+    safe_read_string(temp, 50);
+    trim_whitespace(temp);
+    if (strlen(temp) > 0) {
+        strcpy(addr->city, temp);
+    }
+
+    printf("Enter New State (Current: %s, leave empty to keep): ", addr->state);
+    safe_read_string(temp, 50);
+    trim_whitespace(temp);
+    if (strlen(temp) > 0) {
+        strcpy(addr->state, temp);
+    }
 
     return 1;
 }

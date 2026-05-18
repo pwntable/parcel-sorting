@@ -12,6 +12,9 @@ int is_valid_transition(const char *current_status, const char *new_status);
 // Display status options
 void display_status_options(void);
 
+// Display dynamic status options based on current status
+void display_dynamic_status_options(const char *current_status);
+
 // Get current timestamp string
 void get_current_time(char *buffer, int size);
 

@@ -59,3 +59,17 @@ int validate_alphanumeric(const char *input) {
     }
     return 1;
 }
+
+int parse_parcel_id_input(const char *input) {
+    if (input == NULL || strlen(input) == 0) return 0;
+    
+    const char *p = input;
+    // Find the first digit character
+    while (*p && (*p < '0' || *p > '9')) {
+        p++;
+    }
+    
+    if (*p == '\0') return 0;
+    
+    return atoi(p);
+}

@@ -92,13 +92,13 @@ Enter New Rider Username (or press Enter to cancel): rider2
 Enter Password: rider2password
 
 === ASSIGN ROAD FOR RIDER ===
-------------------------------------------------------------------
-ID    | Street                    | City            | State          
-------------------------------------------------------------------
-101   | Jalan Tun Razak           | Kuala Lumpur    | WP Kuala Lumpur
-102   | Jalan Ampang              | Kuala Lumpur    | WP Kuala Lumpur
-------------------------------------------------------------------
-Enter Address ID to assign (Must be a valid ID from the list): 102
+----------------------------------------------------------------------------------------------------
+ID    | Street                    | City            | State           | Assigned Rider      
+----------------------------------------------------------------------------------------------------
+101   | Jalan Tun Razak           | Kuala Lumpur    | WP Kuala Lumpur | rider1              
+102   | Jalan Ampang              | Kuala Lumpur    | WP Kuala Lumpur | NULL                
+----------------------------------------------------------------------------------------------------
+Enter Address ID to assign (Must be a valid ID from the list, or press Enter/0 to cancel): 102
 
 ===========================================
         RIDER REGISTERED SUCCESSFULLY!     
@@ -132,13 +132,13 @@ Enter New Username (Current: rider2, leave empty to keep): rider2_updated
 Enter New Role (0: Admin, 1: Rider, or press Enter to keep current Rider): 1
 
 === UPDATE ROAD ASSIGNMENT FOR RIDER ===
-------------------------------------------------------------------
-ID    | Street                    | City            | State          
-------------------------------------------------------------------
-101   | Jalan Tun Razak           | Kuala Lumpur    | WP Kuala Lumpur
-102   | Jalan Ampang              | Kuala Lumpur    | WP Kuala Lumpur
-------------------------------------------------------------------
-Enter Address ID to assign (Must be a valid ID from the list, or press Enter to keep current): 101
+----------------------------------------------------------------------------------------------------
+ID    | Street                    | City            | State           | Assigned Rider      
+----------------------------------------------------------------------------------------------------
+101   | Jalan Tun Razak           | Kuala Lumpur    | WP Kuala Lumpur | rider1              
+102   | Jalan Ampang              | Kuala Lumpur    | WP Kuala Lumpur | rider2              
+----------------------------------------------------------------------------------------------------
+Enter Address ID to assign (Must be a valid ID from the list, press Enter to keep current, or 0 to cancel): 101
 
 User updated successfully!
 
@@ -206,17 +206,34 @@ Sender: Aiman
 Receiver: Ibad
 
 === SELECT ADDRESS ===
-------------------------------------------------------------------
-ID    | Street                    | City            | State          
-------------------------------------------------------------------
-101   | Jalan Tun Razak           | Kuala Lumpur    | WP Kuala Lumpur
-102   | Jalan Ampang              | Kuala Lumpur    | WP Kuala Lumpur
-------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+ID    | Street                    | City            | State           | Assigned Rider      
+----------------------------------------------------------------------------------------------------
+101   | Jalan Tun Razak           | Kuala Lumpur    | WP Kuala Lumpur | rider1              
+102   | Jalan Ampang              | Kuala Lumpur    | WP Kuala Lumpur | rider2              
+----------------------------------------------------------------------------------------------------
 Enter Address ID (Must be a valid ID from the list): 101
 House #: 45
 Type (1:Fast, 2:Standard): 1
 
-Parcel created and auto-sorted!
+===========================================
+        PARCEL CREATED SUCCESSFULLY!       
+===========================================
+New Parcel Details:
+  Parcel ID     : 3
+  Sender Name   : Aiman
+  Receiver Name : Ibad
+  House Number  : 45
+  Delivery Type : Fast
+  Status        : Pending
+  Address Road  : Jalan Tun Razak, Kuala Lumpur, WP Kuala Lumpur
+===========================================
+  Barcode Label :
+  █║│█│║│█│║│█│║│█║│█│║█
+  █║│█│║│█│║│█│║│█║│█│║█
+  █║│█│║│█│║│█│║│█║│█│║█
+    *P-0003*
+===========================================
 ```
 
 ---
@@ -228,14 +245,26 @@ Parcel created and auto-sorted!
 1. By ID
 2. By Receiver
 Enter: 1
-ID: 1
+ID: 3
 
---- All Parcels (Prioritized) ---
-------------------------------------------------------------------------------------------------------------------------
-ID | Sender          | Receiver        | Type       | Status       | House# | Street          | City         | State
-------------------------------------------------------------------------------------------------------------------------
-1  | Ali             | Abu             | Fast       | Pending      | 12     | Jalan Tun Razak | Kuala Lumpur | WP KL
-------------------------------------------------------------------------------------------------------------------------
+===========================================
+             PARCEL SEARCH RESULT          
+===========================================
+Details:
+  Parcel ID     : 3
+  Sender Name   : Aiman
+  Receiver Name : Ibad
+  House Number  : 45
+  Delivery Type : Fast
+  Status        : Pending
+  Address Road  : Jalan Tun Razak, Kuala Lumpur, WP Kuala Lumpur
+===========================================
+  Barcode Label :
+  █║│█│║│█│║│█│║│█║│█│║█
+  █║│█│║│█│║│█│║│█║│█│║█
+  █║│█│║│█│║│█│║│█║│█│║█
+    *P-0003*
+===========================================
 ```
 
 ---
@@ -253,11 +282,14 @@ ID | Sender          | Receiver        | Type       | Status       | House# | St
 
 Enter Parcel ID to Update (or press Enter/0 to cancel): 1
 
-=== STATUS OPTIONS ===
-1. Pending
-2. Out for Delivery
-3. Delivered
-New Status (1-3): 3
+=== UPDATE PARCEL STATUS (ID: 1) ===
+Current Status: Pending
+Available Transitions:
+1. Out for Delivery
+2. Delivered
+0. Cancel Update
+
+Enter Choice (or press Enter/0 to cancel): 1
 
 Updated and re-sorted!
 ```
@@ -267,6 +299,13 @@ Updated and re-sorted!
 ## 14. Delete Parcel
 
 ```text
+--- All Parcels in System ---
+------------------------------------------------------------------------------------------------------------------------
+ID | Sender          | Receiver        | Type       | Status       | House# | Street          | City         | State
+------------------------------------------------------------------------------------------------------------------------
+1  | Ali             | Abu             | Fast       | Pending      | 12     | Jalan Tun Razak | Kuala Lumpur | WP KL
+------------------------------------------------------------------------------------------------------------------------
+
 Enter Parcel ID to Delete (or press Enter/0 to cancel): 1
 Deleted successfully.
 ```
@@ -289,12 +328,12 @@ Enter Choice:
 ## 16. View All Addresses
 
 ```text
---------------------------------------------------------------------------------
-ID     | Street                         | City                 | State          
---------------------------------------------------------------------------------
-101    | Jalan Tun Razak                | Kuala Lumpur         | WP Kuala Lumpur
-102    | Jalan Ampang                   | Kuala Lumpur         | WP Kuala Lumpur
---------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+ID    | Street                    | City            | State           | Assigned Rider      
+----------------------------------------------------------------------------------------------------
+101   | Jalan Tun Razak           | Kuala Lumpur    | WP Kuala Lumpur | rider1              
+102   | Jalan Ampang              | Kuala Lumpur    | WP Kuala Lumpur | rider2              
+----------------------------------------------------------------------------------------------------
 ```
 
 ---
@@ -302,10 +341,19 @@ ID     | Street                         | City                 | State
 ## 17. Add New Address
 
 ```text
-Street: Jalan Bukit Bintang
-City: Kuala Lumpur
-State: WP Kuala Lumpur
-Added.
+Street (e.g. Jalan Ampang / Taman Putri Kulai): Jalan Bukit Bintang
+City (e.g. Kuala Lumpur / Kulai): Kuala Lumpur
+State (e.g. WP Kuala Lumpur / Johor): WP Kuala Lumpur
+
+===========================================
+        ADDRESS CREATED SUCCESSFULLY!      
+===========================================
+New Address Details:
+  Address ID : 103
+  Street     : Jalan Bukit Bintang
+  City       : Kuala Lumpur
+  State      : WP Kuala Lumpur
+===========================================
 ```
 
 ---
@@ -313,10 +361,19 @@ Added.
 ## 18. Update Address
 
 ```text
+--- Current Addresses ---
+----------------------------------------------------------------------------------------------------
+ID    | Street                    | City            | State           | Assigned Rider      
+----------------------------------------------------------------------------------------------------
+101   | Jalan Tun Razak           | Kuala Lumpur    | WP Kuala Lumpur | rider1              
+102   | Jalan Ampang              | Kuala Lumpur    | WP Kuala Lumpur | rider2              
+----------------------------------------------------------------------------------------------------
+
 ID to Update (or press Enter/0 to cancel): 101
-Enter New Street (Current: Jalan Tun Razak): Jalan Tun Razak Baru
-Enter New City (Current: Kuala Lumpur): Kuala Lumpur
-Enter New State (Current: WP Kuala Lumpur): WP Kuala Lumpur
+Updating Address ID: 101
+Enter New Street (Current: Jalan Tun Razak, leave empty to keep): Jalan Tun Razak Baru
+Enter New City (Current: Kuala Lumpur, leave empty to keep): 
+Enter New State (Current: WP Kuala Lumpur, leave empty to keep): 
 Updated successfully.
 ```
 

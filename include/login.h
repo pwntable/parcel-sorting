@@ -25,5 +25,6 @@ int register_rider(User users[], int *user_count, const char *username, const ch
 int update_user(User users[], int user_count, int user_id, const char *new_username, int new_role, int new_assigned_address_id);
 int delete_user(User users[], int *user_count, int user_id);
 void display_user_list(User users[], int user_count, Address addresses[], int addr_count);
+void display_address_list_with_riders(Address addresses[], int addr_count, User users[], int user_count);
 
 #endif

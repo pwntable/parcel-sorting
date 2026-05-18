@@ -18,6 +18,18 @@ void display_status_options(void) {
     printf("3. Delivered\n");
 }
 
+void display_dynamic_status_options(const char *current_status) {
+    printf("Current Status: %s\n", current_status);
+    printf("Available Transitions:\n");
+    if (strcmp(current_status, "Pending") == 0) {
+        printf("1. Out for Delivery\n");
+        printf("2. Delivered\n");
+    } else if (strcmp(current_status, "Out for Delivery") == 0) {
+        printf("1. Delivered\n");
+    }
+    printf("0. Cancel Update\n");
+}
+
 int is_valid_transition(const char *current_status, const char *new_status) {
     if (strcmp(current_status, "Pending") == 0) {
         return (strcmp(new_status, "Out for Delivery") == 0 || strcmp(new_status, "Delivered") == 0);
