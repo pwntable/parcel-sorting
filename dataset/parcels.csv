@@ -1,0 +1,11 @@
+parcel_id,sender_name,receiver_name,address_id,delivery_type,status,house_number,time_in,time_out,rider_id
+1,Ali Hassan,Chong Wei Lim,1,Fast,Delivered,12,2026-05-15 08:30,2026-05-15 11:45,3
+2,Siti Aminah,Siti Nurhaliza,2,Standard,Out for Delivery,45,2026-05-15 09:15,,4
+3,Raj Kumar,Rajesh Kumar,3,Standard,Delivered,8,2026-05-15 10:00,2026-05-15 14:20,5
+4,Ahmad Zaki,Ahmad Faizal,4,Fast,Out for Delivery,23,2026-05-16 08:45,,6
+5,Lee Kok Seng,Lee Mei Ling,5,Standard,Delivered,67,2026-05-16 09:30,2026-05-16 12:10,7
+6,Mary Tan,Muhammad Danish,1,Standard,Pending,12,2026-05-16 11:20,,0
+7,Prema Devi,Prema Raman,6,Fast,Delivered,19,2026-05-17 08:10,2026-05-17 10:55,8
+8,Nurul Iman,Nur Aina,7,Standard,Out for Delivery,34,2026-05-17 09:00,,9
+9,James Wong,James Tan,8,Standard,Delivered,5,2026-05-17 10:30,2026-05-17 13:40,10
+10,Fatimah Ali,Fatimah Abdullah,9,Fast,Out for Delivery,77,2026-05-17 14:00,,4
