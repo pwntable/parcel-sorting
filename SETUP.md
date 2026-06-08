@@ -57,7 +57,35 @@ gcc -Wall -Wextra -g -I./include src/*.c -o parcel_system
 
 ---
 
-## 🧪 Step 4: Run Unit Tests
+## 🔄 Step 4: Updating & Recompiling (After pulling updates)
+
+If you pull new updates from git, the compiled executable file (`parcel_system` or `parcel_system.exe`) does **not** update automatically. You must re-compile the program to see your changes:
+
+### **Windows**
+1. Open PowerShell or Command Prompt in the project's root folder (`parcel-sorting`).
+2. Run the compilation command to overwrite the old `.exe`:
+   ```powershell
+   gcc -Wall -Wextra -g -I./include src/*.c -o parcel_system.exe
+   ```
+3. Run the newly compiled program:
+   ```powershell
+   .\parcel_system.exe
+   ```
+
+### **macOS / Linux**
+1. Open Terminal in the project's root folder (`parcel-sorting`).
+2. Run the compilation command:
+   ```bash
+   make
+   ```
+3. Run the newly compiled program:
+   ```bash
+   ./parcel_system
+   ```
+
+---
+
+## 🧪 Step 5: Run Unit Tests
 
 The codebase includes a suite of unit tests to verify the core parcel sorting logic.
 
@@ -77,7 +105,7 @@ gcc -Wall -Wextra -g -I./include tests/test_suite.c src/address.c src/database.c
 
 ---
 
-## 🧹 Step 5: Clean Build Files (macOS / Linux)
+## 🧹 Step 6: Clean Build Files (macOS / Linux)
 
 To delete compiled object files and binaries to clean up your workspace:
 ```bash
@@ -86,7 +114,7 @@ make clean
 
 ---
 
-## 🔑 Step 6: Login Credentials
+## 🔑 Step 7: Login Credentials
 
 The system loads pre-configured accounts from `dataset/users.csv`. Use these credentials to log in:
 

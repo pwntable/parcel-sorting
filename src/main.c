@@ -842,6 +842,10 @@ int main() {
     save_users_to_file(users, user_count, "dataset/users.csv");
     save_addresses_to_file(addresses, addr_count, "dataset/addresses.csv");
     save_parcels_to_file(head, "dataset/parcels.csv");
+
+    printf("\nPress Enter to start...");
+    char temp[10];
+    get_validated_string("", temp, sizeof(temp), 0, sizeof(temp)-1, 0, 1);
   } else {
     printf("Successfully loaded database from CSV files:\n");
     printf("  - Users: %d\n", user_count);
