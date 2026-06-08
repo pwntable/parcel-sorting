@@ -10,10 +10,23 @@ Make sure you have GCC installed. Open your terminal/PowerShell and run:
 ```bash
 gcc --version
 ```
-* **Windows**: If not installed, open PowerShell and run:
-  ```powershell
-  winget install MSYS2.MSYS2
-  ```
+* **Windows**:
+  1. Open PowerShell and run:
+     ```powershell
+     winget install MSYS2.MSYS2
+     ```
+  2. Open the **Windows Start Menu**, search for **"MSYS2 UCRT64"**, and run it.
+  3. Run this command inside the MSYS2 window to install the GCC compiler:
+     ```bash
+     pacman -S --needed base-devel mingw-w64-ucrt-x86_64-toolchain
+     ```
+     *(Press `Enter` to accept all defaults, then type `y` and press `Enter` to confirm)*
+  4. Add GCC to your Windows PATH:
+     * Search Windows for **"Environment Variables"** and select **Edit the system environment variables**.
+     * Click **Environment Variables...**
+     * Under **User variables** (or System variables), select **Path** and click **Edit...**
+     * Click **New**, type `C:\msys64\ucrt64\bin`, and click **OK** to save.
+  5. **Restart** your terminal (PowerShell / Command Prompt) so the changes take effect.
 * **macOS**: If not installed, open Terminal and run:
   ```bash
   xcode-select --install
