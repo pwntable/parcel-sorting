@@ -1,6 +1,6 @@
 # 🚀 Parcel Sorting System - Quick Start Guide
 
-A quick, step-by-step guide to compile and run the **Parcel Sorting and Delivery Management System**.
+A quick, step-by-step guide to compile, run, and test the **Parcel Sorting and Delivery Management System**.
 
 ---
 
@@ -57,11 +57,45 @@ gcc -Wall -Wextra -g -I./include src/*.c -o parcel_system
 
 ---
 
-## 🔑 Step 4: Login Credentials
+## 🧪 Step 4: Run Unit Tests
 
-The system starts with a built-in mock database. Use these pre-configured accounts to log in:
+The codebase includes a suite of unit tests to verify the core parcel sorting logic.
 
-| Role | Username | Password | What it does |
+### **macOS / Linux**
+```bash
+make test
+# OR (if make is not installed):
+gcc -Wall -Wextra -g -I./include tests/test_suite.c src/address.c src/database.c src/login.c src/output.c src/parcel_list.c src/search.c src/sorting.c src/status.c src/validation.c -o test_suite
+./test_suite
+```
+
+### **Windows**
+```powershell
+gcc -Wall -Wextra -g -I./include tests/test_suite.c src/address.c src/database.c src/login.c src/output.c src/parcel_list.c src/search.c src/sorting.c src/status.c src/validation.c -o test_suite.exe
+.\test_suite.exe
+```
+
+---
+
+## 🧹 Step 5: Clean Build Files (macOS / Linux)
+
+To delete compiled object files and binaries to clean up your workspace:
+```bash
+make clean
+```
+
+---
+
+## 🔑 Step 6: Login Credentials
+
+The system loads pre-configured accounts from `dataset/users.csv`. Use these credentials to log in:
+
+| Role | Username | Password | Assigned Road / Notes |
 | :--- | :--- | :--- | :--- |
-| **Admin** | `admin` | `admin123` | Manage users, parcels, and view all reports. |
-| **Rider** | `rider1` | `rider123` | View and update parcels for your assigned route. |
+| **Admin** | `admin01` | `admin123` | Full access. Manage users, parcels, view reports. |
+| **Admin** | `superadmin` | `admin456` | Full access. Manage users, parcels, view reports. |
+| **Rider** | `rider01` | `rider123` | Assigned to: `Jalan Mawar` (Taman Batu Pahat, Johor) |
+| **Rider** | `rider02` | `rider456` | Assigned to: `Jalan Mawar 2` (Taman Batu Pahat, Johor) |
+| **Rider** | `rider04` | `rider789` | Assigned to: `Jalan Kenanga` (Taman Batu Pahat, Johor) |
+
+*(Note: If the CSV files are deleted, the system will initialize a new mock database with fallback credentials `admin`/`admin123` and `rider1`/`rider123`)*
