@@ -1,8 +1,6 @@
 #ifndef ADDRESS_H
 #define ADDRESS_H
 
-#define MAX_ADDRESSES 100
-
 typedef struct {
     int address_id;
     char street[100];
