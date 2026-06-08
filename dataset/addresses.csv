@@ -1,11 +1,4 @@
 address_id,street,city,state,house_number
 1,Jalan Mawar,Taman Batu Pahat,Johor,12
-2,Jalan Melati,Taman Sri Gading,Johor,45
-3,Jalan Anggerik,Taman Kluang,Johor,8
-4,Jalan Teratai,Taman Pontian,Johor,23
-5,Jalan Kenanga,Taman Batu Pahat,Johor,67
-6,Jalan Dahlia,Taman Sri Gading,Johor,19
-7,Jalan Cempaka,Taman Kluang,Johor,34
-8,Jalan Mawar 2,Taman Batu Pahat,Johor,5
-9,Jalan Melati 5,Taman Sri Gading,Johor,77
-10,Jalan Anggerik 3,Taman Pontian,Johor,42
+2,Jalan Mawar 2,Taman Batu Pahat,Johor,5
+3,Jalan Kenanga,Taman Batu Pahat,Johor,67
