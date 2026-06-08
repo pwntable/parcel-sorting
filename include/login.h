@@ -7,6 +7,7 @@
 #define ROLE_ADMIN 0
 #define ROLE_RIDER 1
 #define ROLE_INVALID -1
+#define MAX_USERS 100
 
 typedef struct {
     int user_id;             // Primary Key (Unique User ID)

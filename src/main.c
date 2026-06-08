@@ -11,8 +11,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_USERS 10
-#define MAX_ADDRESSES 50
 
 // --- SUB-MENU: USER MANAGEMENT ---
 void show_user_menu(User users[], int *user_count, Address addresses[],
@@ -122,6 +120,7 @@ void show_user_menu(User users[], int *user_count, Address addresses[],
 
       int res = register_rider(users, user_count, uname, pwd, assigned_id);
       if (res == 1) {
+        save_users_to_file(users, *user_count, "dataset/users.csv");
         // Look up assigned road details
         Address *addr = find_address(addresses, addr_count, assigned_id);
         char road_str[150] = "Unknown Address";
@@ -270,6 +269,7 @@ void show_user_menu(User users[], int *user_count, Address addresses[],
       int update_res = update_user(users, *user_count, target_id, new_uname,
                                    new_role, new_assigned_id);
       if (update_res == 1) {
+        save_users_to_file(users, *user_count, "dataset/users.csv");
         printf("User updated successfully!\n");
       } else if (update_res == -1) {
         printf("Error: Username conflict (new username already taken).\n");
@@ -298,6 +298,7 @@ void show_user_menu(User users[], int *user_count, Address addresses[],
         target_id = atoi(buffer);
         res = delete_user(users, user_count, target_id);
         if (res == 1) {
+          save_users_to_file(users, *user_count, "dataset/users.csv");
           printf("User deleted successfully.\n");
           break;
         } else if (res == -2) {
@@ -381,6 +382,7 @@ void show_parcel_menu(ParcelNode **head, Address addresses[], int addr_count, Us
       get_current_time(p.time_in, 20);
       p.rider_id = 0;
       insert_parcel(head, p);
+      save_parcels_to_file(*head, "dataset/parcels.csv");
 
       Address *addr = find_address(addresses, addr_count, p.address_id);
       char road_str[150] = "Unknown Address";
@@ -519,6 +521,7 @@ void show_parcel_menu(ParcelNode **head, Address addresses[], int addr_count, Us
 
         int update_res = update_parcel_status(head, id, st);
         if (update_res == 1) {
+          save_parcels_to_file(*head, "dataset/parcels.csv");
           printf("Updated and re-sorted!\n");
           break;
         } else {
@@ -540,6 +543,7 @@ void show_parcel_menu(ParcelNode **head, Address addresses[], int addr_count, Us
         }
         int id = parse_parcel_id_input(buffer);
         if (delete_parcel(head, id)) {
+          save_parcels_to_file(*head, "dataset/parcels.csv");
           printf("Deleted successfully.\n");
           break;
         } else {
@@ -590,6 +594,7 @@ void show_address_menu(Address addresses[], int *addr_count, User users[], int u
       safe_read_string(a.state, 50);
       trim_whitespace(a.state);
       if (add_address(addresses, addr_count, a)) {
+        save_addresses_to_file(addresses, *addr_count, "dataset/addresses.csv");
         clear_screen();
         printf("===========================================\n");
         printf("        ADDRESS CREATED SUCCESSFULLY!      \n");
@@ -616,6 +621,7 @@ void show_address_menu(Address addresses[], int *addr_count, User users[], int u
         }
         int id = atoi(buffer);
         if (update_address(addresses, *addr_count, id)) {
+          save_addresses_to_file(addresses, *addr_count, "dataset/addresses.csv");
           printf("Updated successfully.\n");
           break;
         } else {
@@ -817,6 +823,7 @@ void show_rider_menu(ParcelNode **head, int user_idx, User users[],
 
         int update_res = update_parcel_status(head, id, st);
         if (update_res == 1) {
+          save_parcels_to_file(*head, "dataset/parcels.csv");
           printf("Updated and re-sorted!\n");
           break;
         } else {
@@ -840,7 +847,30 @@ int main() {
   int user_count = 0;
   int addr_count = 0;
 
-  init_mock_database(&head, users, &user_count, addresses, &addr_count);
+  // Try to load from CSV dataset
+  user_count = load_users(users, MAX_USERS, "dataset/users.csv");
+  addr_count = load_addresses(addresses, MAX_ADDRESSES, "dataset/addresses.csv");
+  int parcel_count = load_parcels_from_file(&head, "dataset/parcels.csv");
+
+  if (user_count == 0 || addr_count == 0) {
+    printf("CSV database not found or empty. Initializing with mock database...\n");
+    free_all_parcels(&head);
+    head = NULL;
+    init_mock_database(&head, users, &user_count, addresses, &addr_count);
+    
+    // Save to establish baseline files
+    save_users_to_file(users, user_count, "dataset/users.csv");
+    save_addresses_to_file(addresses, addr_count, "dataset/addresses.csv");
+    save_parcels_to_file(head, "dataset/parcels.csv");
+  } else {
+    printf("Successfully loaded database from CSV files:\n");
+    printf("  - Users: %d\n", user_count);
+    printf("  - Addresses: %d\n", addr_count);
+    printf("  - Parcels: %d\n", parcel_count);
+    printf("\nPress Enter to start...");
+    char temp[10];
+    safe_read_string(temp, sizeof(temp));
+  }
 
   while (1) {
     int user_idx = login(users, user_count);
@@ -854,6 +884,11 @@ int main() {
       show_rider_menu(&head, user_idx, users, addresses, addr_count);
     }
   }
+
+  // Final backup save on clean exit
+  save_users_to_file(users, user_count, "dataset/users.csv");
+  save_addresses_to_file(addresses, addr_count, "dataset/addresses.csv");
+  save_parcels_to_file(head, "dataset/parcels.csv");
 
   free_all_parcels(&head);
   printf("Goodbye!\n");

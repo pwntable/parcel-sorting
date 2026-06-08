@@ -12,7 +12,7 @@
 void test_address_management(void) {
     printf("Running Test: Address Management...\n");
 
-    Address addresses[50] = {0};
+    Address addresses[MAX_ADDRESSES] = {0};
     int count = 0;
 
     // 1. Add addresses
@@ -40,7 +40,7 @@ void test_address_management(void) {
 void test_login_and_user_management(void) {
     printf("Running Test: Login & User Management (Road Assignment)...\n");
 
-    User users[10] = {0};
+    User users[MAX_USERS] = {0};
     int user_count = 0;
 
     // 1. Mock Admin

@@ -5,7 +5,7 @@
 #include "../include/validation.h"
 
 int add_address(Address addresses[], int *count, Address new_addr) {
-    if (*count >= 50) { // Using 50 as MAX_ADDRESSES from main.c
+    if (*count >= MAX_ADDRESSES) {
         return 0;
     }
 

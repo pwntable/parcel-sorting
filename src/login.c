@@ -56,7 +56,7 @@ int login(User users[], int user_count) {
 }
 
 int register_rider(User users[], int *user_count, const char *username, const char *password, int assigned_address_id) {
-    if (*user_count >= 10) return 0; // Limit reached
+    if (*user_count >= MAX_USERS) return 0; // Limit reached
     if (assigned_address_id <= 0) return -2; // Road assignment is mandatory for Rider
 
     // Check if user already exists
