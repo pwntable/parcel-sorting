@@ -79,16 +79,9 @@ void display_sorted_parcels(ParcelNode *sorted_head, Address addresses[], int ad
         return;
     }
 
-    char current_type[20] = "";
-
+    print_table_header();
     ParcelNode *current = sorted_head;
     while (current != NULL) {
-        if (strcmp(current->data.delivery_type, current_type) != 0) {
-            strcpy(current_type, current->data.delivery_type);
-            printf("\n--- %s DELIVERY ---\n", strcmp(current_type, "Fast") == 0 ? "FAST" : "STANDARD");
-            print_table_header();
-        }
-        
         print_table_row(&current->data, addresses, addr_count, users, user_count);
         current = current->next;
     }
@@ -174,25 +167,20 @@ void display_rider_sorted_parcels(ParcelNode *sorted_head, int assigned_address_
         return;
     }
 
-    char current_type[20] = "";
-    int has_displayed_header = 0;
-
+    int has_displayed_any = 0;
     ParcelNode *current = sorted_head;
     while (current != NULL) {
         // Only process parcels that belong to this Rider's road!
         if (current->data.address_id == assigned_address_id) {
-            if (strcmp(current->data.delivery_type, current_type) != 0) {
-                strcpy(current_type, current->data.delivery_type);
-                printf("\n--- %s DELIVERY ---\n", strcmp(current_type, "Fast") == 0 ? "FAST" : "STANDARD");
+            if (!has_displayed_any) {
                 print_table_header();
-                has_displayed_header = 1;
+                has_displayed_any = 1;
             }
-            
             print_table_row(&current->data, addresses, addr_count, users, user_count);
         }
         current = current->next;
     }
-    if (has_displayed_header) {
+    if (has_displayed_any) {
         print_divider();
     } else {
         printf("No active sorted parcels assigned to your road.\n");
@@ -271,4 +259,119 @@ void print_barcode(int parcel_id) {
         printf("│║█\n");
     }
     printf("    *P-%04d*\n", parcel_id);
+}
+
+void display_rider_commission(ParcelNode *head, User users[], int user_count, Address addresses[], int addr_count, int rider_idx) {
+    int std_count = 0;
+    int fast_count = 0;
+    User *rider = &users[rider_idx];
+    
+    printf("=== COMMISSION REPORT FOR RIDER: %s ===\n", rider->username);
+    printf("Commission Rates: Standard = RM 3.00, Fast = RM 6.00\n\n");
+    
+    int has_any = 0;
+    ParcelNode *current = head;
+    while (current != NULL) {
+        Parcel *p = &current->data;
+        if (strcmp(p->status, "Delivered") == 0) {
+            if (p->rider_id == rider->user_id || (p->rider_id == 0 && p->address_id == rider->assigned_address_id)) {
+                if (!has_any) {
+                    print_table_header();
+                    has_any = 1;
+                }
+                print_table_row(p, addresses, addr_count, users, user_count);
+                if (strcmp(p->delivery_type, "Fast") == 0) {
+                    fast_count++;
+                } else {
+                    std_count++;
+                }
+            }
+        }
+        current = current->next;
+    }
+    
+    if (has_any) {
+        print_divider();
+    } else {
+        printf("No delivered parcels found for your assigned road.\n");
+    }
+    
+    double std_pay = std_count * 3.00;
+    double fast_pay = fast_count * 6.00;
+    double total_pay = std_pay + fast_pay;
+    
+    printf("\n+---------------------------------------+\n");
+    printf("|          COMMISSION SUMMARY           |\n");
+    printf("+---------------------------------------+\n");
+    printf("| Standard:   %-3d @ RM 3.00 = RM %-6.2f |\n", std_count, std_pay);
+    printf("| Fast:       %-3d @ RM 6.00 = RM %-6.2f |\n", fast_count, fast_pay);
+    printf("+---------------------------------------+\n");
+    printf("| Total Commission Earned:   RM %-6.2f |\n", total_pay);
+    printf("+---------------------------------------+\n");
+}
+
+void display_all_riders_commission_report(ParcelNode *head, User users[], int user_count, Address addresses[], int addr_count) {
+    printf("=== SYSTEM-WIDE RIDER COMMISSION REPORT ===\n");
+    printf("Commission Rates: Standard = RM 3.00, Fast = RM 6.00\n\n");
+    
+    printf("----------------------------------------------------------------------------------------------------\n");
+    printf("%-6s | %-15s | %-25s | %-13s | %-14s | %-15s\n", 
+           "ID", "Rider Username", "Assigned Road", "Std Delivered", "Fast Delivered", "Total Earned");
+    printf("----------------------------------------------------------------------------------------------------\n");
+    
+    int total_std = 0;
+    int total_fast = 0;
+    double grand_total = 0.0;
+    int rider_exists = 0;
+    
+    for (int i = 0; i < user_count; i++) {
+        if (users[i].role != ROLE_RIDER) continue;
+        
+        rider_exists = 1;
+        int std_count = 0;
+        int fast_count = 0;
+        
+        ParcelNode *current = head;
+        while (current != NULL) {
+            Parcel *p = &current->data;
+            if (strcmp(p->status, "Delivered") == 0) {
+                if (p->rider_id == users[i].user_id || (p->rider_id == 0 && p->address_id == users[i].assigned_address_id)) {
+                    if (strcmp(p->delivery_type, "Fast") == 0) {
+                        fast_count++;
+                    } else {
+                        std_count++;
+                    }
+                }
+            }
+            current = current->next;
+        }
+        
+        double total_pay = (std_count * 3.00) + (fast_count * 6.00);
+        
+        total_std += std_count;
+        total_fast += fast_count;
+        grand_total += total_pay;
+        
+        char road_str[50] = "N/A";
+        Address *addr = find_address(addresses, addr_count, users[i].assigned_address_id);
+        if (addr) {
+            snprintf(road_str, sizeof(road_str), "%s (%s)", addr->street, addr->city);
+        }
+        
+        printf("%-6d | %-15.15s | %-25.25s | %-13d | %-14d | RM %-11.2f\n",
+               users[i].user_id,
+               users[i].username,
+               road_str,
+               std_count,
+               fast_count,
+               total_pay);
+    }
+    
+    if (!rider_exists) {
+        printf("No riders registered in the system.\n");
+    }
+    printf("----------------------------------------------------------------------------------------------------\n");
+    printf("Grand Totals: %-42s | Std: %-8d | Fast: %-9d | RM %-11.2f\n", 
+           "", total_std, total_fast, grand_total);
+    printf("----------------------------------------------------------------------------------------------------\n");
 }

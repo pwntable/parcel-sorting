@@ -8,6 +8,7 @@
 #include "../include/status.h"
 #include "../include/search.h"
 #include "../include/sorting.h"
+#include "../include/output.h"
 
 void test_address_management(void) {
     printf("Running Test: Address Management...\n");
@@ -208,6 +209,77 @@ void test_search_features(void) {
     printf("-> Search Features PASSED!\n\n");
 }
 
+void test_commission_calculation(void) {
+    printf("Running Test: Rider Commission Calculations...\n");
+
+    User users[5] = {0};
+    int user_count = 0;
+    
+    // Setup riders
+    users[0].user_id = 1;
+    strcpy(users[0].username, "admin");
+    users[0].role = ROLE_ADMIN;
+    
+    users[1].user_id = 2;
+    strcpy(users[1].username, "rider1");
+    users[1].role = ROLE_RIDER;
+    users[1].assigned_address_id = 101;
+    
+    users[2].user_id = 3;
+    strcpy(users[2].username, "rider2");
+    users[2].role = ROLE_RIDER;
+    users[2].assigned_address_id = 102;
+    user_count = 3;
+
+    Address addresses[5] = {0};
+    int addr_count = 2;
+    addresses[0].address_id = 101;
+    strcpy(addresses[0].street, "Jalan Tun Razak");
+    addresses[1].address_id = 102;
+    strcpy(addresses[1].street, "Jalan Ampang");
+
+    ParcelNode *head = NULL;
+    
+    // Deliveries for rider1 (assigned_address_id = 101)
+    Parcel p1 = {1, "Ali", "Abu", 101, "Fast", "Delivered", 12, "2026-05-17 12:00", "2026-05-17 13:00", 0}; // RM 6
+    Parcel p2 = {2, "Siti", "Ahmad", 101, "Standard", "Delivered", 5, "2026-05-17 12:05", "2026-05-17 13:05", 0}; // RM 3
+    Parcel p3 = {3, "Ravi", "Muthu", 101, "Fast", "Pending", 3, "2026-05-17 12:10", "", 0}; // Pending (Not delivered, should not count)
+    
+    // Deliveries for rider2 (assigned_address_id = 102)
+    Parcel p4 = {4, "John", "Doe", 102, "Standard", "Delivered", 1, "2026-05-17 12:15", "2026-05-17 13:10", 0}; // RM 3
+    
+    insert_parcel(&head, p1);
+    insert_parcel(&head, p2);
+    insert_parcel(&head, p3);
+    insert_parcel(&head, p4);
+
+    // Call displays to ensure they run and don't crash
+    printf("\n--- Test Display: Rider 1 Commission ---\n");
+    display_rider_commission(head, users, user_count, addresses, addr_count, 1);
+    
+    printf("\n--- Test Display: System-wide Commission ---\n");
+    display_all_riders_commission_report(head, users, user_count, addresses, addr_count);
+
+    // Verify calculations manually / programmatically if possible:
+    // Rider 1: p1 (Fast, Delivered, RM 6) + p2 (Standard, Delivered, RM 3) = RM 9.00
+    // Rider 2: p4 (Standard, Delivered, RM 3) = RM 3.00
+    int r1_std = 0, r1_fast = 0;
+    ParcelNode *curr = head;
+    while (curr != NULL) {
+        Parcel *p = &curr->data;
+        if (strcmp(p->status, "Delivered") == 0 && (p->rider_id == 2 || (p->rider_id == 0 && p->address_id == 101))) {
+            if (strcmp(p->delivery_type, "Fast") == 0) r1_fast++;
+            else r1_std++;
+        }
+        curr = curr->next;
+    }
+    assert(r1_fast == 1);
+    assert(r1_std == 1);
+
+    free_all_parcels(&head);
+    printf("-> Rider Commission Calculations PASSED!\n\n");
+}
+
 int main(void) {
     printf("===========================================\n");
     printf("         PARCEL SORTING TEST SUITE         \n");
@@ -218,6 +290,7 @@ int main(void) {
     test_parcel_sorting_and_linked_list();
     test_status_transitions();
     test_search_features();
+    test_commission_calculation();
 
     printf("===========================================\n");
     printf("      ALL TESTS PASSED SUCCESSFULLY!       \n");

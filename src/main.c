@@ -494,6 +494,17 @@ void show_parcel_menu(ParcelNode **head, Address addresses[], int addr_count, Us
           if (c == 1) strcpy(st, "Delivered");
         }
 
+        if (strcmp(st, "Delivered") == 0) {
+          int assigned_rider_id = 0;
+          for (int i = 0; i < user_count; i++) {
+            if (users[i].role == ROLE_RIDER && users[i].assigned_address_id == n->data.address_id) {
+              assigned_rider_id = users[i].user_id;
+              break;
+            }
+          }
+          n->data.rider_id = assigned_rider_id;
+        }
+
         int update_res = update_parcel_status(head, id, st);
         if (update_res == 1) {
           save_parcels_to_file(*head, "dataset/parcels.csv");
@@ -613,8 +624,9 @@ void show_report_menu(ParcelNode *head, Address addresses[], int addr_count, Use
     printf("=== REPORTS & ANALYTICS ===\n");
     printf("1. Admin Summary Report\n");
     printf("2. View Delivery Queue (Non-Delivered)\n");
-    printf("3. Return to Main Menu\n");
-    choice = get_validated_choice("Enter Choice: ", 1, 3);
+    printf("3. Rider Commission Report\n");
+    printf("4. Return to Main Menu\n");
+    choice = get_validated_choice("Enter Choice: ", 1, 4);
 
     switch (choice) {
     case 1:
@@ -623,14 +635,20 @@ void show_report_menu(ParcelNode *head, Address addresses[], int addr_count, Use
       break;
     case 2: {
       clear_screen();
-      display_sorted_parcels(head, addresses, addr_count, users, user_count);
+      ParcelNode *sorted = generate_sorted_queue(head);
+      display_sorted_parcels(sorted, addresses, addr_count, users, user_count);
+      free_sorted_queue(&sorted);
     } break;
     case 3:
+      clear_screen();
+      display_all_riders_commission_report(head, users, user_count, addresses, addr_count);
+      break;
+    case 4:
       return;
     }
     printf("\nPress Enter to continue...");
     get_validated_string("", buffer, sizeof(buffer), 0, sizeof(buffer)-1, 0, 1);
-  } while (choice != 3);
+  } while (choice != 4);
 }
 
 // --- MAIN ADMIN MENU ---
@@ -690,18 +708,21 @@ void show_rider_menu(ParcelNode **head, int user_idx, User users[], int user_cou
     printf("1. View My Assigned Road Parcels\n");
     printf("2. View All Sorted Parcels\n");
     printf("3. Update Parcel Status\n");
-    printf("4. Logout\n");
-    choice = get_validated_choice("Enter Choice: ", 1, 4);
+    printf("4. View My Commission Report\n");
+    printf("5. Logout\n");
+    choice = get_validated_choice("Enter Choice: ", 1, 5);
 
     switch (choice) {
     case 1:
       clear_screen();
       display_rider_parcels(*head, assigned_road_id, addresses, addr_count, users, user_count);
       break;
-    case 2:
+    case 2: {
       clear_screen();
-      display_rider_sorted_parcels(*head, assigned_road_id, addresses, addr_count, users, user_count);
-      break;
+      ParcelNode *sorted = generate_sorted_queue(*head);
+      display_rider_sorted_parcels(sorted, assigned_road_id, addresses, addr_count, users, user_count);
+      free_sorted_queue(&sorted);
+    } break;
     case 3: {
       ParcelNode *n = NULL;
       int id = 0;
@@ -772,6 +793,10 @@ void show_rider_menu(ParcelNode **head, int user_idx, User users[], int user_cou
           if (c == 1) strcpy(st, "Delivered");
         }
 
+        if (strcmp(st, "Delivered") == 0) {
+          n->data.rider_id = users[user_idx].user_id;
+        }
+
         int update_res = update_parcel_status(head, id, st);
         if (update_res == 1) {
           save_parcels_to_file(*head, "dataset/parcels.csv");
@@ -784,11 +809,15 @@ void show_rider_menu(ParcelNode **head, int user_idx, User users[], int user_cou
       }
     } break;
     case 4:
+      clear_screen();
+      display_rider_commission(*head, users, user_count, addresses, addr_count, user_idx);
+      break;
+    case 5:
       return;
     }
     printf("\nPress Enter to continue...");
     get_validated_string("", buffer, sizeof(buffer), 0, sizeof(buffer)-1, 0, 1);
-  } while (choice != 4);
+  } while (choice != 5);
 }
 
 int main() {

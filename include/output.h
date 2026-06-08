@@ -21,5 +21,7 @@ void display_rider_sorted_parcels(ParcelNode *sorted_head, int assigned_address_
 void display_active_parcels(ParcelNode *head, Address addresses[], int addr_count, User users[], int user_count);
 void display_rider_active_parcels(ParcelNode *head, int assigned_address_id, Address addresses[], int addr_count, User users[], int user_count);
 void print_barcode(int parcel_id);
+void display_rider_commission(ParcelNode *head, User users[], int user_count, Address addresses[], int addr_count, int rider_idx);
+void display_all_riders_commission_report(ParcelNode *head, User users[], int user_count, Address addresses[], int addr_count);
 
 #endif
