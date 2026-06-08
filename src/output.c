@@ -3,17 +3,17 @@
 #include "../include/output.h"
 
 void print_divider(void) {
-    printf("--------------------------------------------------------------------------------------------------------------------------------------\n");
+    printf("--------------------------------------------------------------------------------------------------------------------------------------------------------\n");
 }
 
 void print_table_header(void) {
     print_divider();
-    printf("%-4s | %-15s | %-15s | %-8s | %-12s | %-6s | %-20s | %-15s | %-15s\n",
-           "ID", "Sender", "Receiver", "Type", "Status", "House#", "Street", "City", "State");
+    printf("%-4s | %-15s | %-15s | %-8s | %-12s | %-6s | %-20s | %-15s | %-15s | %-15s\n",
+           "ID", "Sender", "Receiver", "Type", "Status", "House#", "Street", "City", "State", "Rider");
     print_divider();
 }
 
-void print_table_row(Parcel *parcel, Address addresses[], int addr_count) {
+void print_table_row(Parcel *parcel, Address addresses[], int addr_count, User users[], int user_count) {
     Address *addr = find_address(addresses, addr_count, parcel->address_id);
     char street[21] = "N/A", city[16] = "N/A", state[16] = "N/A";
     
@@ -23,7 +23,24 @@ void print_table_row(Parcel *parcel, Address addresses[], int addr_count) {
         strncpy(state, addr->state, 15); state[15] = '\0';
     }
 
-    printf("%-4d | %-15.15s | %-15.15s | %-8.8s | %-12.12s | %-6d | %-20.20s | %-15.15s | %-15.15s\n",
+    const char *rider_uname = "Unassigned";
+    if (parcel->rider_id > 0) {
+        for (int i = 0; i < user_count; i++) {
+            if (users[i].user_id == parcel->rider_id) {
+                rider_uname = users[i].username;
+                break;
+            }
+        }
+    } else {
+        for (int i = 0; i < user_count; i++) {
+            if (users[i].role == ROLE_RIDER && users[i].assigned_address_id == parcel->address_id) {
+                rider_uname = users[i].username;
+                break;
+            }
+        }
+    }
+
+    printf("%-4d | %-15.15s | %-15.15s | %-8.8s | %-12.12s | %-6d | %-20.20s | %-15.15s | %-15.15s | %-15.15s\n",
            parcel->parcel_id,
            parcel->sender_name,
            parcel->receiver_name,
@@ -32,10 +49,11 @@ void print_table_row(Parcel *parcel, Address addresses[], int addr_count) {
            parcel->house_number,
            street,
            city,
-           state);
+           state,
+           rider_uname);
 }
 
-void display_all_parcels(ParcelNode *head, Address addresses[], int addr_count) {
+void display_all_parcels(ParcelNode *head, Address addresses[], int addr_count, User users[], int user_count) {
     if (head == NULL) {
         printf("No parcels in system.\n");
         return;
@@ -46,7 +64,7 @@ void display_all_parcels(ParcelNode *head, Address addresses[], int addr_count) 
     int count = 0;
     ParcelNode *current = head;
     while (current != NULL) {
-        print_table_row(&current->data, addresses, addr_count);
+        print_table_row(&current->data, addresses, addr_count, users, user_count);
         count++;
         current = current->next;
     }
@@ -54,14 +72,13 @@ void display_all_parcels(ParcelNode *head, Address addresses[], int addr_count) 
     printf("Total: %d parcels\n", count);
 }
 
-void display_sorted_parcels(ParcelNode *sorted_head, Address addresses[], int addr_count) {
+void display_sorted_parcels(ParcelNode *sorted_head, Address addresses[], int addr_count, User users[], int user_count) {
     printf("=== SORTED DELIVERY QUEUE ===\n");
     if (sorted_head == NULL) {
         printf("No active parcels to sort.\n");
         return;
     }
 
-    int position = 1;
     char current_type[20] = "";
 
     ParcelNode *current = sorted_head;
@@ -72,13 +89,13 @@ void display_sorted_parcels(ParcelNode *sorted_head, Address addresses[], int ad
             print_table_header();
         }
         
-        print_table_row(&current->data, addresses, addr_count);
+        print_table_row(&current->data, addresses, addr_count, users, user_count);
         current = current->next;
     }
     print_divider();
 }
 
-void display_parcels_by_status(ParcelNode *head, const char *status, Address addresses[], int addr_count) {
+void display_parcels_by_status(ParcelNode *head, const char *status, Address addresses[], int addr_count, User users[], int user_count) {
     if (head == NULL) {
         printf("No parcels in system.\n");
         return;
@@ -89,7 +106,7 @@ void display_parcels_by_status(ParcelNode *head, const char *status, Address add
     ParcelNode *current = head;
     while (current != NULL) {
         if (strcmp(current->data.status, status) == 0) {
-            print_table_row(&current->data, addresses, addr_count);
+            print_table_row(&current->data, addresses, addr_count, users, user_count);
             count++;
         }
         current = current->next;
@@ -126,20 +143,20 @@ void display_summary(ParcelNode *head) {
     printf("+-------------------------+\n");
 }
 
-void display_admin_report(ParcelNode *head, Address addresses[], int addr_count) {
+void display_admin_report(ParcelNode *head, Address addresses[], int addr_count, User users[], int user_count) {
     display_summary(head);
     printf("\n");
-    display_all_parcels(head, addresses, addr_count);
+    display_all_parcels(head, addresses, addr_count, users, user_count);
 }
 
-void display_rider_parcels(ParcelNode *head, int assigned_address_id, Address addresses[], int addr_count) {
+void display_rider_parcels(ParcelNode *head, int assigned_address_id, Address addresses[], int addr_count, User users[], int user_count) {
     int count = 0;
     print_table_header();
     
     ParcelNode *current = head;
     while (current != NULL) {
         if (current->data.address_id == assigned_address_id) {
-            print_table_row(&current->data, addresses, addr_count);
+            print_table_row(&current->data, addresses, addr_count, users, user_count);
             count++;
         }
         current = current->next;
@@ -150,7 +167,7 @@ void display_rider_parcels(ParcelNode *head, int assigned_address_id, Address ad
            addr ? addr->street : "Unknown", count);
 }
 
-void display_rider_sorted_parcels(ParcelNode *sorted_head, int assigned_address_id, Address addresses[], int addr_count) {
+void display_rider_sorted_parcels(ParcelNode *sorted_head, int assigned_address_id, Address addresses[], int addr_count, User users[], int user_count) {
     printf("=== SORTED DELIVERY QUEUE ===\n");
     if (sorted_head == NULL) {
         printf("No active parcels to sort.\n");
@@ -171,7 +188,7 @@ void display_rider_sorted_parcels(ParcelNode *sorted_head, int assigned_address_
                 has_displayed_header = 1;
             }
             
-            print_table_row(&current->data, addresses, addr_count);
+            print_table_row(&current->data, addresses, addr_count, users, user_count);
         }
         current = current->next;
     }
@@ -182,7 +199,7 @@ void display_rider_sorted_parcels(ParcelNode *sorted_head, int assigned_address_
     }
 }
 
-void display_active_parcels(ParcelNode *head, Address addresses[], int addr_count) {
+void display_active_parcels(ParcelNode *head, Address addresses[], int addr_count, User users[], int user_count) {
     if (head == NULL) {
         printf("No parcels in system.\n");
         return;
@@ -193,7 +210,7 @@ void display_active_parcels(ParcelNode *head, Address addresses[], int addr_coun
     ParcelNode *current = head;
     while (current != NULL) {
         if (strcmp(current->data.status, "Delivered") != 0) {
-            print_table_row(&current->data, addresses, addr_count);
+            print_table_row(&current->data, addresses, addr_count, users, user_count);
             count++;
         }
         current = current->next;
@@ -202,7 +219,7 @@ void display_active_parcels(ParcelNode *head, Address addresses[], int addr_coun
     printf("Total Active (Non-Delivered) Parcels: %d\n", count);
 }
 
-void display_rider_active_parcels(ParcelNode *head, int assigned_address_id, Address addresses[], int addr_count) {
+void display_rider_active_parcels(ParcelNode *head, int assigned_address_id, Address addresses[], int addr_count, User users[], int user_count) {
     if (head == NULL) {
         printf("No parcels in system.\n");
         return;
@@ -213,7 +230,7 @@ void display_rider_active_parcels(ParcelNode *head, int assigned_address_id, Add
     ParcelNode *current = head;
     while (current != NULL) {
         if (current->data.address_id == assigned_address_id && strcmp(current->data.status, "Delivered") != 0) {
-            print_table_row(&current->data, addresses, addr_count);
+            print_table_row(&current->data, addresses, addr_count, users, user_count);
             count++;
         }
         current = current->next;

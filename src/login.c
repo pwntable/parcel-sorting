@@ -4,13 +4,8 @@
 #include "../include/validation.h"
 
 void display_login_prompt(char *username, char *password) {
-    printf("Enter Username: ");
-    safe_read_string(username, 30);
-    trim_whitespace(username);
-
-    printf("Enter Password: ");
-    safe_read_string(password, 30);
-    trim_whitespace(password);
+    get_validated_string("Enter Username: ", username, 30, 1, 29, 0, 0);
+    get_validated_string("Enter Password: ", password, 30, 1, 29, 0, 0);
 }
 
 int verify_credentials(User users[], int user_count, const char *username, const char *password) {

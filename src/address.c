@@ -37,26 +37,24 @@ int update_address(Address addresses[], int count, int address_id) {
     if (addr == NULL) return 0;
 
     char temp[100];
+    char prompt_buf[150];
 
     printf("Updating Address ID: %d\n", address_id);
 
-    printf("Enter New Street (Current: %s, leave empty to keep): ", addr->street);
-    safe_read_string(temp, 100);
-    trim_whitespace(temp);
+    snprintf(prompt_buf, sizeof(prompt_buf), "Enter New Street (Current: %s, leave empty to keep): ", addr->street);
+    get_validated_string(prompt_buf, temp, 100, 0, 99, 0, 1);
     if (strlen(temp) > 0) {
         strcpy(addr->street, temp);
     }
 
-    printf("Enter New City (Current: %s, leave empty to keep): ", addr->city);
-    safe_read_string(temp, 50);
-    trim_whitespace(temp);
+    snprintf(prompt_buf, sizeof(prompt_buf), "Enter New City (Current: %s, leave empty to keep): ", addr->city);
+    get_validated_string(prompt_buf, temp, 50, 0, 49, 0, 1);
     if (strlen(temp) > 0) {
         strcpy(addr->city, temp);
     }
 
-    printf("Enter New State (Current: %s, leave empty to keep): ", addr->state);
-    safe_read_string(temp, 50);
-    trim_whitespace(temp);
+    snprintf(prompt_buf, sizeof(prompt_buf), "Enter New State (Current: %s, leave empty to keep): ", addr->state);
+    get_validated_string(prompt_buf, temp, 50, 0, 49, 0, 1);
     if (strlen(temp) > 0) {
         strcpy(addr->state, temp);
     }
