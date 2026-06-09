@@ -23,10 +23,24 @@ static char* custom_strcasestr(const char *haystack, const char *needle) {
     return NULL;
 }
 
+/**
+ * @brief Search for a parcel in the list by its unique parcel ID.
+ * 
+ * @param head Pointer to the head of the linked list.
+ * @param parcel_id The unique ID of the parcel to search.
+ * @return ParcelNode* Pointer to the matching ParcelNode, or NULL if not found.
+ */
 ParcelNode* search_by_id(ParcelNode *head, int parcel_id) {
     return find_parcel(head, parcel_id);
 }
 
+/**
+ * @brief Search for the first parcel in the list matching a receiver name (case-insensitive substring match).
+ * 
+ * @param head Pointer to the head of the linked list.
+ * @param name The receiver name or substring to search for.
+ * @return ParcelNode* Pointer to the first matching ParcelNode, or NULL if not found.
+ */
 ParcelNode* search_by_receiver(ParcelNode *head, const char *name) {
     ParcelNode *current = head;
     while (current != NULL) {
@@ -38,6 +52,13 @@ ParcelNode* search_by_receiver(ParcelNode *head, const char *name) {
     return NULL;
 }
 
+/**
+ * @brief Search for the first parcel in the list matching a status string (case-insensitive match).
+ * 
+ * @param head Pointer to the head of the linked list.
+ * @param status The status string to search for (e.g. "Pending").
+ * @return ParcelNode* Pointer to the first matching ParcelNode, or NULL if not found.
+ */
 ParcelNode* search_by_status(ParcelNode *head, const char *status) {
     ParcelNode *current = head;
     while (current != NULL) {
@@ -49,6 +70,13 @@ ParcelNode* search_by_status(ParcelNode *head, const char *status) {
     return NULL;
 }
 
+/**
+ * @brief Search for the first parcel in the list matching a delivery type (case-insensitive match).
+ * 
+ * @param head Pointer to the head of the linked list.
+ * @param type The delivery type string to search for (e.g. "Fast").
+ * @return ParcelNode* Pointer to the first matching ParcelNode, or NULL if not found.
+ */
 ParcelNode* search_by_delivery_type(ParcelNode *head, const char *type) {
     ParcelNode *current = head;
     while (current != NULL) {

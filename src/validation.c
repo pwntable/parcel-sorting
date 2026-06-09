@@ -4,6 +4,11 @@
 #include <string.h>
 #include <ctype.h>
 
+/**
+ * @brief Clears the terminal screen.
+ * 
+ * Invokes standard OS commands ("cls" on Windows, "clear" on macOS/Linux).
+ */
 void clear_screen(void) {
 #ifdef _WIN32
     system("cls");
@@ -12,6 +17,11 @@ void clear_screen(void) {
 #endif
 }
 
+/**
+ * @brief Strips leading and trailing white space characters from a string in-place.
+ * 
+ * @param str The string to trim.
+ */
 void trim_whitespace(char *str) {
     if (str == NULL) return;
     char *end;
@@ -22,6 +32,15 @@ void trim_whitespace(char *str) {
     end[1] = '\0';
 }
 
+/**
+ * @brief Safely reads a string from stdin up to a specified size.
+ * 
+ * Cleans the input trailing newline character and flushes stdin if the input exceeds buffer size.
+ * 
+ * @param buffer Character array to store the input.
+ * @param size The maximum size of the buffer.
+ * @return int 1 if read successfully, 0 on failure.
+ */
 int safe_read_string(char *buffer, int size) {
     if (fgets(buffer, size, stdin) != NULL) {
         size_t len = strlen(buffer);
@@ -37,6 +56,12 @@ int safe_read_string(char *buffer, int size) {
     return 0;
 }
 
+/**
+ * @brief Validates if a string contains only digit characters.
+ * 
+ * @param input The string to validate.
+ * @return int 1 if valid positive integer representation, 0 otherwise.
+ */
 int validate_integer(const char *input) {
     if (!input || *input == '\0') return 0;
     while (*input) {
@@ -46,11 +71,25 @@ int validate_integer(const char *input) {
     return 1;
 }
 
+/**
+ * @brief Validates if the length of a string falls within a specified range.
+ * 
+ * @param input The string to check.
+ * @param min Minimum character limit.
+ * @param max Maximum character limit.
+ * @return int 1 if length is within range, 0 otherwise.
+ */
 int validate_string_length(const char *input, int min, int max) {
     int len = strlen(input);
     return len >= min && len <= max;
 }
 
+/**
+ * @brief Validates if a string contains only alphanumeric characters (letters and numbers).
+ * 
+ * @param input The string to validate.
+ * @return int 1 if alphanumeric, 0 otherwise.
+ */
 int validate_alphanumeric(const char *input) {
     if (!input || *input == '\0') return 0;
     while (*input) {
@@ -60,6 +99,14 @@ int validate_alphanumeric(const char *input) {
     return 1;
 }
 
+/**
+ * @brief Parses the first sequence of numbers encountered in a string.
+ * 
+ * Useful for scanning scan-codes or barcode IDs containing prefixes (e.g. "*P-0001*").
+ * 
+ * @param input The input string containing digit sequences.
+ * @return int The parsed integer ID, or 0 if no digits found.
+ */
 int parse_parcel_id_input(const char *input) {
     if (input == NULL || strlen(input) == 0) return 0;
     
@@ -74,6 +121,16 @@ int parse_parcel_id_input(const char *input) {
     return atoi(p);
 }
 
+/**
+ * @brief Interactively prompts the user to enter a numeric choice within a range.
+ * 
+ * Continues prompting until a valid integer in [min, max] is entered.
+ * 
+ * @param prompt Prompt string to print.
+ * @param min Minimum acceptable choice value.
+ * @param max Maximum acceptable choice value.
+ * @return int The validated choice.
+ */
 int get_validated_choice(const char *prompt, int min, int max) {
     char buffer[64];
     while (1) {
@@ -92,6 +149,18 @@ int get_validated_choice(const char *prompt, int min, int max) {
     }
 }
 
+/**
+ * @brief Prompts user for a string input with rules on length, alphanumeric characters, and emptiness.
+ * 
+ * @param prompt Prompt string.
+ * @param dest Output character array to copy input to.
+ * @param dest_size Size of destination array.
+ * @param min_len Minimum length of string.
+ * @param max_len Maximum length of string.
+ * @param is_alphanumeric If 1, string must be strictly alphanumeric.
+ * @param allow_empty If 1, user can press Enter to submit empty string.
+ * @return int Returns 1.
+ */
 int get_validated_string(const char *prompt, char *dest, int dest_size, int min_len, int max_len, int is_alphanumeric, int allow_empty) {
     char buffer[512];
     while (1) {
@@ -124,6 +193,14 @@ int get_validated_string(const char *prompt, char *dest, int dest_size, int min_
     }
 }
 
+/**
+ * @brief Interactively prompts the user to enter a positive integer ID.
+ * 
+ * @param prompt Prompt string.
+ * @param allow_empty If 1, pressing Enter returns 0 in out_id.
+ * @param out_id Pointer to store the validated output ID.
+ * @return int Returns 1.
+ */
 int get_validated_int_id(const char *prompt, int allow_empty, int *out_id) {
     char buffer[64];
     while (1) {

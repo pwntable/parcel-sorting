@@ -15,6 +15,16 @@
 #define MAX_ADDRESSES 50
 
 // --- SUB-MENU: USER MANAGEMENT ---
+/**
+ * @brief Displays the sub-menu for user management and handles corresponding input choices.
+ * 
+ * Accessible only by Admins. Allows viewing, registering, updating, and deleting riders/admins.
+ * 
+ * @param users Array of User structures.
+ * @param user_count Pointer to the current user count.
+ * @param addresses Array of Address structures.
+ * @param addr_count Current address count.
+ */
 void show_user_menu(User users[], int *user_count, Address addresses[],
                     int addr_count) {
   int choice;
@@ -311,6 +321,17 @@ void show_user_menu(User users[], int *user_count, Address addresses[],
 }
 
 // --- SUB-MENU: PARCEL MANAGEMENT ---
+/**
+ * @brief Displays the sub-menu for parcel management and routes actions.
+ * 
+ * Supports viewing, creating, searching, updating status, and deleting parcels.
+ * 
+ * @param head Pointer to the head pointer of the parcel list.
+ * @param addresses Array of Address structures.
+ * @param addr_count Current address count.
+ * @param users Array of User structures.
+ * @param user_count Current user count.
+ */
 void show_parcel_menu(ParcelNode **head, Address addresses[], int addr_count, User users[], int user_count) {
   int choice;
   char buffer[50];
@@ -397,36 +418,30 @@ void show_parcel_menu(ParcelNode **head, Address addresses[], int addr_count, Us
         f = search_by_id(*head, search_id);
         if (f) {
           clear_screen();
-          printf("===========================================\n");
-          printf("             PARCEL SEARCH RESULT          \n");
-          printf("===========================================\n");
-          printf("Details:\n");
-          printf("  Parcel ID     : %d\n", f->data.parcel_id);
-          printf("  Sender Name   : %s\n", f->data.sender_name);
-          printf("  Receiver Name : %s\n", f->data.receiver_name);
-          printf("  House Number  : %d\n", f->data.house_number);
-          printf("  Delivery Type : %s\n", f->data.delivery_type);
-          printf("  Status        : %s\n", f->data.status);
-          
-          Address *addr = find_address(addresses, addr_count, f->data.address_id);
-          char road_str[150] = "Unknown Address";
-          if (addr) {
-            snprintf(road_str, sizeof(road_str), "%s, %s, %s", addr->street, addr->city, addr->state);
-          }
-          printf("  Address Road  : %s\n", road_str);
-          printf("===========================================\n");
-          print_barcode(f->data.parcel_id);
-          printf("===========================================\n");
+          display_parcel_detail(&f->data, addresses, addr_count, users, user_count);
         } else {
           printf("Not found.\n");
         }
       } else {
         char search_name[30];
         get_validated_string("Name: ", search_name, 30, 1, 29, 0, 0);
-        f = search_by_receiver(*head, search_name);
-        if (f) {
-          display_all_parcels(f, addresses, addr_count, users, user_count);
-        } else {
+        
+        ParcelNode *current = *head;
+        int found_any = 0;
+        while (current != NULL) {
+          ParcelNode *match = search_by_receiver(current, search_name);
+          if (match != NULL) {
+            if (!found_any) {
+              clear_screen();
+              found_any = 1;
+            }
+            display_parcel_detail(&match->data, addresses, addr_count, users, user_count);
+            current = match->next;
+          } else {
+            break;
+          }
+        }
+        if (!found_any) {
           printf("Not found.\n");
         }
       }
@@ -547,6 +562,16 @@ void show_parcel_menu(ParcelNode **head, Address addresses[], int addr_count, Us
 }
 
 // --- SUB-MENU: ADDRESS MANAGEMENT ---
+/**
+ * @brief Displays the address management sub-menu.
+ * 
+ * Supports viewing, adding, and updating street addresses.
+ * 
+ * @param addresses Array of Address structures.
+ * @param addr_count Pointer to the current address count.
+ * @param users Array of User structures.
+ * @param user_count Current user count.
+ */
 void show_address_menu(Address addresses[], int *addr_count, User users[], int user_count) {
   int choice;
   char buffer[50];
@@ -616,6 +641,15 @@ void show_address_menu(Address addresses[], int *addr_count, User users[], int u
 }
 
 // --- SUB-MENU: REPORTS ---
+/**
+ * @brief Displays the report selection menu and prints summaries/commissions.
+ * 
+ * @param head Pointer to the parcel linked list.
+ * @param addresses Array of Address structures.
+ * @param addr_count Current address count.
+ * @param users Array of User structures.
+ * @param user_count Current user count.
+ */
 void show_report_menu(ParcelNode *head, Address addresses[], int addr_count, User users[], int user_count) {
   int choice;
   char buffer[10];
@@ -652,6 +686,17 @@ void show_report_menu(ParcelNode *head, Address addresses[], int addr_count, Use
 }
 
 // --- MAIN ADMIN MENU ---
+/**
+ * @brief Entry point for the Admin console interface.
+ * 
+ * Routes user choices to specific sub-menus.
+ * 
+ * @param head Pointer to the head pointer of the parcel list.
+ * @param users Array of User structures.
+ * @param user_count Pointer to the current user count.
+ * @param addresses Array of Address structures.
+ * @param addr_count Pointer to the current address count.
+ */
 void show_admin_main_menu(ParcelNode **head, User users[], int *user_count,
                           Address addresses[], int *addr_count) {
   int choice;
@@ -685,6 +730,19 @@ void show_admin_main_menu(ParcelNode **head, User users[], int *user_count,
   } while (choice != 5);
 }
 
+/**
+ * @brief Entry point for the Rider console interface.
+ * 
+ * Provides access to Rider-specific workflows: viewing assigned parcels,
+ * updating status for parcels on their assigned road, and viewing their commission.
+ * 
+ * @param head Pointer to the head pointer of the parcel list.
+ * @param user_idx Array index of the logged-in Rider user.
+ * @param users Array of User structures.
+ * @param user_count Current user count.
+ * @param addresses Array of Address structures.
+ * @param addr_count Current address count.
+ */
 void show_rider_menu(ParcelNode **head, int user_idx, User users[], int user_count,
                      Address addresses[], int addr_count) {
   int choice;
@@ -820,6 +878,14 @@ void show_rider_menu(ParcelNode **head, int user_idx, User users[], int user_cou
   } while (choice != 5);
 }
 
+/**
+ * @brief Main entry point of the Parcel Sorting system.
+ * 
+ * Initializes the database (loads from CSV or defaults to mock), runs the login loop,
+ * routes authenticated users to their corresponding roles, and saves on exit.
+ * 
+ * @return int 0 on clean exit.
+ */
 int main() {
   ParcelNode *head = NULL;
   User users[MAX_USERS];

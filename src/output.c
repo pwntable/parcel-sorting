@@ -2,10 +2,16 @@
 #include <string.h>
 #include "../include/output.h"
 
+/**
+ * @brief Prints a standard horizontal divider line for formatted tables.
+ */
 void print_divider(void) {
     printf("--------------------------------------------------------------------------------------------------------------------------------------------------------\n");
 }
 
+/**
+ * @brief Prints the column headers for the parcel listings table.
+ */
 void print_table_header(void) {
     print_divider();
     printf("%-4s | %-15s | %-15s | %-8s | %-12s | %-6s | %-20s | %-15s | %-15s | %-15s\n",
@@ -13,6 +19,17 @@ void print_table_header(void) {
     print_divider();
 }
 
+/**
+ * @brief Prints a single row of parcel details formatted to align with the table headers.
+ * 
+ * Resolves address road details and rider username from corresponding IDs.
+ * 
+ * @param parcel The Parcel structure to print.
+ * @param addresses Array of Address structures.
+ * @param addr_count Current number of addresses.
+ * @param users Array of User structures.
+ * @param user_count Current number of users.
+ */
 void print_table_row(Parcel *parcel, Address addresses[], int addr_count, User users[], int user_count) {
     Address *addr = find_address(addresses, addr_count, parcel->address_id);
     char street[21] = "N/A", city[16] = "N/A", state[16] = "N/A";
@@ -53,6 +70,15 @@ void print_table_row(Parcel *parcel, Address addresses[], int addr_count, User u
            rider_uname);
 }
 
+/**
+ * @brief Displays all parcels starting from the specified head node in a tabular format.
+ * 
+ * @param head Head node of the parcel linked list.
+ * @param addresses Array of Address structures.
+ * @param addr_count Current number of addresses.
+ * @param users Array of User structures.
+ * @param user_count Current number of users.
+ */
 void display_all_parcels(ParcelNode *head, Address addresses[], int addr_count, User users[], int user_count) {
     if (head == NULL) {
         printf("No parcels in system.\n");
@@ -72,6 +98,15 @@ void display_all_parcels(ParcelNode *head, Address addresses[], int addr_count, 
     printf("Total: %d parcels\n", count);
 }
 
+/**
+ * @brief Displays a tabular list of parcels sorted by priority.
+ * 
+ * @param sorted_head Head node of the sorted parcel queue.
+ * @param addresses Array of Address structures.
+ * @param addr_count Current number of addresses.
+ * @param users Array of User structures.
+ * @param user_count Current number of users.
+ */
 void display_sorted_parcels(ParcelNode *sorted_head, Address addresses[], int addr_count, User users[], int user_count) {
     printf("=== SORTED DELIVERY QUEUE ===\n");
     if (sorted_head == NULL) {
@@ -88,6 +123,16 @@ void display_sorted_parcels(ParcelNode *sorted_head, Address addresses[], int ad
     print_divider();
 }
 
+/**
+ * @brief Filters and displays parcels matching a specific status string in tabular format.
+ * 
+ * @param head Head node of the parcel linked list.
+ * @param status Status filter query (e.g. "Pending").
+ * @param addresses Array of Address structures.
+ * @param addr_count Current number of addresses.
+ * @param users Array of User structures.
+ * @param user_count Current number of users.
+ */
 void display_parcels_by_status(ParcelNode *head, const char *status, Address addresses[], int addr_count, User users[], int user_count) {
     if (head == NULL) {
         printf("No parcels in system.\n");
@@ -108,6 +153,13 @@ void display_parcels_by_status(ParcelNode *head, const char *status, Address add
     printf("Total %s: %d parcels\n", status, count);
 }
 
+/**
+ * @brief Prints an analytical summary containing total counts categorized by status and type.
+ * 
+ * Shows total parcels, pending counts, out-for-delivery counts, delivered counts, standard, and fast types.
+ * 
+ * @param head Head node of the parcel linked list.
+ */
 void display_summary(ParcelNode *head) {
     int total = 0, pending = 0, out = 0, delivered = 0, fast = 0, standard = 0;
     
@@ -136,12 +188,31 @@ void display_summary(ParcelNode *head) {
     printf("+-------------------------+\n");
 }
 
+/**
+ * @brief Prints the master analytical summary and displays all system parcels in a table.
+ * 
+ * @param head Head node of the parcel linked list.
+ * @param addresses Array of Address structures.
+ * @param addr_count Current number of addresses.
+ * @param users Array of User structures.
+ * @param user_count Current number of users.
+ */
 void display_admin_report(ParcelNode *head, Address addresses[], int addr_count, User users[], int user_count) {
     display_summary(head);
     printf("\n");
     display_all_parcels(head, addresses, addr_count, users, user_count);
 }
 
+/**
+ * @brief Displays all parcels assigned to a Rider's specific road assignment.
+ * 
+ * @param head Head node of the parcel linked list.
+ * @param assigned_address_id Address ID of the Rider's assigned road.
+ * @param addresses Array of Address structures.
+ * @param addr_count Current number of addresses.
+ * @param users Array of User structures.
+ * @param user_count Current number of users.
+ */
 void display_rider_parcels(ParcelNode *head, int assigned_address_id, Address addresses[], int addr_count, User users[], int user_count) {
     int count = 0;
     print_table_header();
@@ -160,6 +231,16 @@ void display_rider_parcels(ParcelNode *head, int assigned_address_id, Address ad
            addr ? addr->street : "Unknown", count);
 }
 
+/**
+ * @brief Displays a sorted queue of active parcels that belong only to a Rider's assigned road.
+ * 
+ * @param sorted_head Head node of the sorted parcel queue.
+ * @param assigned_address_id Address ID of the Rider's assigned road.
+ * @param addresses Array of Address structures.
+ * @param addr_count Current number of addresses.
+ * @param users Array of User structures.
+ * @param user_count Current number of users.
+ */
 void display_rider_sorted_parcels(ParcelNode *sorted_head, int assigned_address_id, Address addresses[], int addr_count, User users[], int user_count) {
     printf("=== SORTED DELIVERY QUEUE ===\n");
     if (sorted_head == NULL) {
@@ -187,6 +268,15 @@ void display_rider_sorted_parcels(ParcelNode *sorted_head, int assigned_address_
     }
 }
 
+/**
+ * @brief Displays all active (non-delivered) parcels in the system.
+ * 
+ * @param head Head node of the parcel linked list.
+ * @param addresses Array of Address structures.
+ * @param addr_count Current number of addresses.
+ * @param users Array of User structures.
+ * @param user_count Current number of users.
+ */
 void display_active_parcels(ParcelNode *head, Address addresses[], int addr_count, User users[], int user_count) {
     if (head == NULL) {
         printf("No parcels in system.\n");
@@ -207,6 +297,16 @@ void display_active_parcels(ParcelNode *head, Address addresses[], int addr_coun
     printf("Total Active (Non-Delivered) Parcels: %d\n", count);
 }
 
+/**
+ * @brief Displays all active (non-delivered) parcels assigned to a Rider's specific road assignment.
+ * 
+ * @param head Head node of the parcel linked list.
+ * @param assigned_address_id Address ID of the Rider's assigned road.
+ * @param addresses Array of Address structures.
+ * @param addr_count Current number of addresses.
+ * @param users Array of User structures.
+ * @param user_count Current number of users.
+ */
 void display_rider_active_parcels(ParcelNode *head, int assigned_address_id, Address addresses[], int addr_count, User users[], int user_count) {
     if (head == NULL) {
         printf("No parcels in system.\n");
@@ -229,6 +329,13 @@ void display_rider_active_parcels(ParcelNode *head, int assigned_address_id, Add
            addr ? addr->street : "Unknown", count);
 }
 
+/**
+ * @brief Generates and prints a pseudo-graphical barcode representation of a parcel ID.
+ * 
+ * Uses block and line symbols to represent distinct guard and digit patterns.
+ * 
+ * @param parcel_id The parcel ID to represent.
+ */
 void print_barcode(int parcel_id) {
     char code_str[10];
     snprintf(code_str, sizeof(code_str), "%04d", parcel_id);
@@ -261,6 +368,19 @@ void print_barcode(int parcel_id) {
     printf("    *P-%04d*\n", parcel_id);
 }
 
+/**
+ * @brief Displays commission report for a specific Rider.
+ * 
+ * Standard delivery: RM 3.00, Fast delivery: RM 6.00. Filters by Rider's assigned parcels
+ * that have been successfully delivered.
+ * 
+ * @param head Head node of the parcel linked list.
+ * @param users Array of User structures.
+ * @param user_count Current number of users.
+ * @param addresses Array of Address structures.
+ * @param addr_count Current number of addresses.
+ * @param rider_idx Array index of the Rider user.
+ */
 void display_rider_commission(ParcelNode *head, User users[], int user_count, Address addresses[], int addr_count, int rider_idx) {
     int std_count = 0;
     int fast_count = 0;
@@ -310,6 +430,17 @@ void display_rider_commission(ParcelNode *head, User users[], int user_count, Ad
     printf("+---------------------------------------+\n");
 }
 
+/**
+ * @brief Displays a system-wide commission report summarizing stats for all Riders.
+ * 
+ * Shows total Standard/Fast deliveries made and cumulative commission earned per Rider.
+ * 
+ * @param head Head node of the parcel linked list.
+ * @param users Array of User structures.
+ * @param user_count Current number of users.
+ * @param addresses Array of Address structures.
+ * @param addr_count Current number of addresses.
+ */
 void display_all_riders_commission_report(ParcelNode *head, User users[], int user_count, Address addresses[], int addr_count) {
     printf("=== SYSTEM-WIDE RIDER COMMISSION REPORT ===\n");
     printf("Commission Rates: Standard = RM 3.00, Fast = RM 6.00\n\n");
@@ -375,3 +506,43 @@ void display_all_riders_commission_report(ParcelNode *head, User users[], int us
            "", total_std, total_fast, grand_total);
     printf("----------------------------------------------------------------------------------------------------\n");
 }
+
+/**
+ * @brief Displays a highly detailed formatted card representation of a single parcel.
+ * 
+ * Shows details such as parcel ID, sender name, receiver name, house number, delivery type,
+ * status, address road, and its printed barcode.
+ * 
+ * @param parcel Pointer to the Parcel structure.
+ * @param addresses Array of Address structures.
+ * @param addr_count Current number of addresses.
+ * @param users Array of User structures.
+ * @param user_count Current number of users.
+ */
+void display_parcel_detail(Parcel *parcel, Address addresses[], int addr_count, User users[], int user_count) {
+    if (parcel == NULL) return;
+    (void)users;
+    (void)user_count;
+
+    printf("===========================================\n");
+    printf("             PARCEL SEARCH RESULT          \n");
+    printf("===========================================\n");
+    printf("Details:\n");
+    printf("  Parcel ID     : %d\n", parcel->parcel_id);
+    printf("  Sender Name   : %s\n", parcel->sender_name);
+    printf("  Receiver Name : %s\n", parcel->receiver_name);
+    printf("  House Number  : %d\n", parcel->house_number);
+    printf("  Delivery Type : %s\n", parcel->delivery_type);
+    printf("  Status        : %s\n", parcel->status);
+    
+    Address *addr = find_address(addresses, addr_count, parcel->address_id);
+    char road_str[150] = "Unknown Address";
+    if (addr) {
+        snprintf(road_str, sizeof(road_str), "%s, %s, %s", addr->street, addr->city, addr->state);
+    }
+    printf("  Address Road  : %s\n", road_str);
+    printf("===========================================\n");
+    print_barcode(parcel->parcel_id);
+    printf("===========================================\n");
+}
+

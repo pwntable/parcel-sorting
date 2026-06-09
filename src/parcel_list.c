@@ -2,6 +2,20 @@
 
 // Helper to determine the priority order of two parcels
 // Returns < 0 if p1 should come before p2
+/**
+ * @brief Determines the priority sorting order of two parcels.
+ * 
+ * Sorting logic:
+ * 1. Status: Non-Delivered items always come before Delivered items.
+ * 2. If status is same:
+ *    - For active (Non-Delivered) parcels, prioritize Fast Delivery type over Standard.
+ *    - If type is also same, sort by house number ascending.
+ *    - For delivered parcels, sort by parcel_id ascending (history).
+ * 
+ * @param p1 First parcel.
+ * @param p2 Second parcel.
+ * @return int Negative value if p1 should come before p2, positive if after, or 0 if equal.
+ */
 int compare_parcels(Parcel p1, Parcel p2) {
     // 1. Status: Non-Delivered items always come before Delivered items
     int p1_delivered = (strcmp(p1.status, "Delivered") == 0);
@@ -23,6 +37,14 @@ int compare_parcels(Parcel p1, Parcel p2) {
     return p1.parcel_id - p2.parcel_id;
 }
 
+/**
+ * @brief Inserts a parcel into the linked list in self-sorted priority order.
+ * 
+ * Uses compare_parcels to find the correct sorted insertion point.
+ * 
+ * @param head Pointer to the head pointer of the linked list.
+ * @param new_parcel The Parcel structure to insert.
+ */
 void insert_parcel(ParcelNode **head, Parcel new_parcel) {
     ParcelNode *new_node = (ParcelNode *)malloc(sizeof(ParcelNode));
     if (new_node == NULL) {
@@ -49,7 +71,14 @@ void insert_parcel(ParcelNode **head, Parcel new_parcel) {
     current->next = new_node;
 }
 
-// Re-sort the entire list (useful after a status update)
+/**
+ * @brief Re-sorts the entire linked list of parcels.
+ * 
+ * Useful after a status transition (e.g. from Pending to Delivered) which impacts priority order.
+ * Re-inserts all nodes into a new linked list.
+ * 
+ * @param head Pointer to the head pointer of the linked list.
+ */
 void sort_parcel_list(ParcelNode **head) {
     if (*head == NULL || (*head)->next == NULL) return;
 
@@ -65,6 +94,15 @@ void sort_parcel_list(ParcelNode **head) {
     *head = sorted;
 }
 
+/**
+ * @brief Deletes a parcel from the linked list by its unique parcel ID.
+ * 
+ * Frees the memory of the deleted node.
+ * 
+ * @param head Pointer to the head pointer of the linked list.
+ * @param parcel_id The unique ID of the parcel to delete.
+ * @return int Returns 1 if deleted successfully, or 0 if not found.
+ */
 int delete_parcel(ParcelNode **head, int parcel_id) {
     ParcelNode *current = *head;
     ParcelNode *prev = NULL;
@@ -85,6 +123,13 @@ int delete_parcel(ParcelNode **head, int parcel_id) {
     return 0;
 }
 
+/**
+ * @brief Finds a parcel node in the linked list by its unique ID.
+ * 
+ * @param head Pointer to the head of the linked list.
+ * @param parcel_id The unique ID to search for.
+ * @return ParcelNode* Pointer to the matching ParcelNode, or NULL if not found.
+ */
 ParcelNode* find_parcel(ParcelNode *head, int parcel_id) {
     ParcelNode *current = head;
     while (current != NULL) {
@@ -96,6 +141,11 @@ ParcelNode* find_parcel(ParcelNode *head, int parcel_id) {
     return NULL;
 }
 
+/**
+ * @brief Frees all nodes in the parcel linked list and sets the head pointer to NULL.
+ * 
+ * @param head Pointer to the head pointer of the linked list.
+ */
 void free_all_parcels(ParcelNode **head) {
     ParcelNode *current = *head;
     ParcelNode *next_node;
@@ -107,6 +157,12 @@ void free_all_parcels(ParcelNode **head) {
     *head = NULL;
 }
 
+/**
+ * @brief Counts the total number of parcels in the linked list.
+ * 
+ * @param head Pointer to the head of the linked list.
+ * @return int Total number of nodes.
+ */
 int count_parcels(ParcelNode *head) {
     int count = 0;
     ParcelNode *current = head;

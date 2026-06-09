@@ -4,6 +4,17 @@
 #include <string.h>
 
 // Initialize with mocked data so we don't rely on text files or SQLite for now
+/**
+ * @brief Initializes the program state with a predefined set of mock data.
+ * 
+ * Sets up 2 default users (1 Admin, 1 Rider), 2 addresses, and 2 parcels.
+ * 
+ * @param head Pointer to the head of the Parcel linked list.
+ * @param users Array to store registered users.
+ * @param user_count Pointer to the current number of users.
+ * @param addresses Array to store addresses.
+ * @param address_count Pointer to the current number of addresses.
+ */
 void init_mock_database(ParcelNode **head, User users[], int *user_count,
                         Address addresses[], int *address_count) {
   // 1. Mock Users
@@ -65,9 +76,15 @@ void init_mock_database(ParcelNode **head, User users[], int *user_count,
   insert_parcel(head, p1);
 }
 
-// Helper function to extract fields from a CSV line.
-// Replaces the next comma with a null terminator and advances the pointer.
-// Handles empty fields correctly (e.g. consecutive commas return empty string "").
+/**
+ * @brief Helper function to parse a single field from a comma-separated CSV line.
+ * 
+ * Replaces the next comma with a null terminator and advances the pointer.
+ * Handles trailing newlines and carriage returns, as well as empty fields.
+ * 
+ * @param line Pointer to the string pointer of the current CSV line.
+ * @return char* Pointer to the parsed field string.
+ */
 static char *parse_csv_field(char **line) {
   if (*line == NULL || **line == '\0') {
     return "";
@@ -88,6 +105,16 @@ static char *parse_csv_field(char **line) {
   return start;
 }
 
+/**
+ * @brief Loads parcel data from a CSV file and inserts them into the linked list.
+ * 
+ * Skips header line and parsed corrupted lines. Automatically structures and auto-sorts
+ * parcels upon insertion.
+ * 
+ * @param head Pointer to the head of the Parcel linked list.
+ * @param filename Path to the CSV file.
+ * @return int The total number of loaded parcels, or 0 if file could not be opened.
+ */
 int load_parcels_from_file(ParcelNode **head, const char *filename) {
   FILE *fp = fopen(filename, "r");
   if (!fp) {
@@ -156,6 +183,15 @@ int load_parcels_from_file(ParcelNode **head, const char *filename) {
   return count;
 }
 
+/**
+ * @brief Saves the current linked list of parcels into a CSV file.
+ * 
+ * Writes headers and preserves the exact state of all fields in each parcel.
+ * 
+ * @param head Pointer to the head of the Parcel linked list.
+ * @param filename Path to the output CSV file.
+ * @return int Returns 1 on success, 0 on failure.
+ */
 int save_parcels_to_file(ParcelNode *head, const char *filename) {
   FILE *fp = fopen(filename, "w");
   if (!fp) {
@@ -186,6 +222,16 @@ int save_parcels_to_file(ParcelNode *head, const char *filename) {
   return 1;
 }
 
+/**
+ * @brief Loads user credentials and configurations from a CSV file.
+ * 
+ * Parses standard user schema fields into the user array up to the max limit.
+ * 
+ * @param users Array of User structures.
+ * @param max Maximum number of users that can be stored in the array.
+ * @param filename Path to the users CSV file.
+ * @return int The total number of users loaded, or 0 if file could not be opened.
+ */
 int load_users(User users[], int max, const char *filename) {
   FILE *fp = fopen(filename, "r");
   if (!fp) {
@@ -231,6 +277,16 @@ int load_users(User users[], int max, const char *filename) {
   return count;
 }
 
+/**
+ * @brief Saves the array of users into a CSV file.
+ * 
+ * Writes headers and serializes all current user accounts.
+ * 
+ * @param users Array of User structures.
+ * @param count Current number of users.
+ * @param filename Path to the output CSV file.
+ * @return int Returns 1 on success, 0 on failure.
+ */
 int save_users_to_file(User users[], int count, const char *filename) {
   FILE *fp = fopen(filename, "w");
   if (!fp) {
@@ -253,6 +309,16 @@ int save_users_to_file(User users[], int count, const char *filename) {
   return 1;
 }
 
+/**
+ * @brief Loads address data from a CSV file.
+ * 
+ * Reads street, city, state, and house number details.
+ * 
+ * @param addresses Array of Address structures.
+ * @param max Maximum number of addresses that can be stored in the array.
+ * @param filename Path to the CSV file.
+ * @return int The total number of addresses loaded, or 0 if file could not be opened.
+ */
 int load_addresses(Address addresses[], int max, const char *filename) {
   FILE *fp = fopen(filename, "r");
   if (!fp) {
@@ -300,6 +366,16 @@ int load_addresses(Address addresses[], int max, const char *filename) {
   return count;
 }
 
+/**
+ * @brief Saves the current array of addresses into a CSV file.
+ * 
+ * Writes headers and records IDs and textual address data.
+ * 
+ * @param addresses Array of Address structures.
+ * @param count Current number of addresses.
+ * @param filename Path to the output CSV file.
+ * @return int Returns 1 on success, 0 on failure.
+ */
 int save_addresses_to_file(Address addresses[], int count, const char *filename) {
   FILE *fp = fopen(filename, "w");
   if (!fp) {
@@ -322,6 +398,14 @@ int save_addresses_to_file(Address addresses[], int count, const char *filename)
   return 1;
 }
 
+/**
+ * @brief Computes the next unique parcel ID to assign.
+ * 
+ * Traverses the current linked list of parcels to find the maximum ID and returns max + 1.
+ * 
+ * @param head Pointer to the head of the Parcel linked list.
+ * @return int The next unique integer ID.
+ */
 int get_next_parcel_id(ParcelNode *head) {
   int max_id = 0;
   ParcelNode *current = head;
