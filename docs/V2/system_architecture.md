@@ -16,7 +16,7 @@ The system is divided into **8 modules**, each handling a specific responsibilit
 | Search Parcel | `search.c` / `search.h` | Aidil | Search/filter parcels |
 
 Additionally, the **linked list** operations are centralized in:
-- `parcel_list.c` / `parcel_list.h` — shared by all modules
+- `parcel_list.c` / `parcel_list.h` — shared by all modules | Khai
 
 ---
 

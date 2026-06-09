@@ -20,7 +20,4 @@ int save_addresses_to_file(Address addresses[], int count, const char *filename)
 // Generate next unique parcel ID
 int get_next_parcel_id(ParcelNode *head);
 
-// Init mock data
-void init_mock_database(ParcelNode **head, User users[], int *user_count, Address addresses[], int *address_count);
-
 #endif

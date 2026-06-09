@@ -899,28 +899,20 @@ int main() {
   int parcel_count = load_parcels_from_file(&head, "dataset/parcels.csv");
 
   if (user_count == 0 || addr_count == 0) {
-    printf("CSV database not found or empty. Initializing with mock database...\n");
+    printf("Error: CSV database files (users.csv or addresses.csv) not found or empty.\n");
+    printf("Please make sure dataset/users.csv and dataset/addresses.csv exist and contain valid data.\n");
     free_all_parcels(&head);
-    head = NULL;
-    init_mock_database(&head, users, &user_count, addresses, &addr_count);
-    
-    // Save to establish baseline files
-    save_users_to_file(users, user_count, "dataset/users.csv");
-    save_addresses_to_file(addresses, addr_count, "dataset/addresses.csv");
-    save_parcels_to_file(head, "dataset/parcels.csv");
-
-    printf("\nPress Enter to start...");
-    char temp[10];
-    get_validated_string("", temp, sizeof(temp), 0, sizeof(temp)-1, 0, 1);
-  } else {
-    printf("Successfully loaded database from CSV files:\n");
-    printf("  - Users: %d\n", user_count);
-    printf("  - Addresses: %d\n", addr_count);
-    printf("  - Parcels: %d\n", parcel_count);
-    printf("\nPress Enter to start...");
-    char temp[10];
-    get_validated_string("", temp, sizeof(temp), 0, sizeof(temp)-1, 0, 1);
+    return 1;
   }
+
+  printf("Successfully loaded database from CSV files:\n");
+  printf("  - Users: %d\n", user_count);
+  printf("  - Addresses: %d\n", addr_count);
+  printf("  - Parcels: %d\n", parcel_count);
+  printf("\nPress Enter to start...");
+  char temp[10];
+  get_validated_string("", temp, sizeof(temp), 0, sizeof(temp)-1, 0, 1);
+
 
   while (1) {
     int user_idx = login(users, user_count);
