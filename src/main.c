@@ -16,10 +16,12 @@
 
 // --- SUB-MENU: USER MANAGEMENT ---
 /**
- * @brief Displays the sub-menu for user management and handles corresponding input choices.
- * 
- * Accessible only by Admins. Allows viewing, registering, updating, and deleting riders/admins.
- * 
+ * @brief Displays the sub-menu for user management and handles corresponding
+ * input choices.
+ *
+ * Accessible only by Admins. Allows viewing, registering, updating, and
+ * deleting riders/admins.
+ *
  * @param users Array of User structures.
  * @param user_count Pointer to the current user count.
  * @param addresses Array of Address structures.
@@ -49,7 +51,9 @@ void show_user_menu(User users[], int *user_count, Address addresses[],
       char uname[30], pwd[30];
       int exists = 0;
       while (1) {
-        get_validated_string("Enter New Rider Username (or press Enter to cancel): ", uname, 30, 0, 29, 1, 1);
+        get_validated_string(
+            "Enter New Rider Username (or press Enter to cancel): ", uname, 30,
+            0, 29, 1, 1);
         if (strlen(uname) == 0) {
           exists = -1; // Cancelled
           break;
@@ -67,9 +71,11 @@ void show_user_menu(User users[], int *user_count, Address addresses[],
         if (!exists) {
           break; // Username is unique!
         }
-        printf("Error: Username already exists. Please try a different username.\n\n");
+        printf("Error: Username already exists. Please try a different "
+               "username.\n\n");
       }
-      if (exists == -1) break;
+      if (exists == -1)
+        break;
 
       get_validated_string("Enter Password: ", pwd, 30, 1, 29, 0, 0);
 
@@ -79,40 +85,50 @@ void show_user_menu(User users[], int *user_count, Address addresses[],
       while (1) {
         clear_screen();
         printf("=== ASSIGN ROAD FOR RIDER ===\n");
-        display_address_list_with_riders(addresses, addr_count, users, *user_count);
-        
-        if (!get_validated_int_id("Enter Address ID to assign (Must be a valid ID from the list, or press Enter/0 to cancel): ", 1, &assigned_id) || assigned_id == 0) {
+        display_address_list_with_riders(addresses, addr_count, users,
+                                         *user_count);
+
+        if (!get_validated_int_id(
+                "Enter Address ID to assign (Must be a valid ID from the list, "
+                "or press Enter/0 to cancel): ",
+                1, &assigned_id) ||
+            assigned_id == 0) {
           reg_cancelled = 1;
           break;
         }
-        
+
         // 1. Verify it exists in the address list
         if (find_address(addresses, addr_count, assigned_id) == NULL) {
-          printf("\nError: Invalid Address ID! Please select a valid ID from the list.\n");
+          printf("\nError: Invalid Address ID! Please select a valid ID from "
+                 "the list.\n");
           printf("Press Enter to try again...\n");
-          get_validated_string("", buffer, sizeof(buffer), 0, sizeof(buffer)-1, 0, 1);
+          get_validated_string("", buffer, sizeof(buffer), 0,
+                               sizeof(buffer) - 1, 0, 1);
           continue;
         }
-        
+
         // 2. Verify it is not already assigned to another rider
         int road_taken = 0;
         for (int i = 0; i < *user_count; i++) {
-          if (users[i].role == ROLE_RIDER && users[i].assigned_address_id == assigned_id) {
+          if (users[i].role == ROLE_RIDER &&
+              users[i].assigned_address_id == assigned_id) {
             road_taken = 1;
             break;
           }
         }
-        
+
         if (road_taken) {
-          printf("\nError: Duplicate Road Assignment! This road is already assigned to another rider.\n");
+          printf("\nError: Duplicate Road Assignment! This road is already "
+                 "assigned to another rider.\n");
           printf("Press Enter to try again...\n");
-          get_validated_string("", buffer, sizeof(buffer), 0, sizeof(buffer)-1, 0, 1);
+          get_validated_string("", buffer, sizeof(buffer), 0,
+                               sizeof(buffer) - 1, 0, 1);
           continue;
         }
-        
+
         break; // Valid and unique road selected!
       }
-      
+
       if (reg_cancelled) {
         printf("\nRegistration cancelled.\n");
         break;
@@ -125,9 +141,10 @@ void show_user_menu(User users[], int *user_count, Address addresses[],
         Address *addr = find_address(addresses, addr_count, assigned_id);
         char road_str[150] = "Unknown Address";
         if (addr) {
-          snprintf(road_str, sizeof(road_str), "%s, %s, %s", addr->street, addr->city, addr->state);
+          snprintf(road_str, sizeof(road_str), "%s, %s, %s", addr->street,
+                   addr->city, addr->state);
         }
-        
+
         clear_screen();
         printf("===========================================\n");
         printf("        RIDER REGISTERED SUCCESSFULLY!     \n");
@@ -141,7 +158,8 @@ void show_user_menu(User users[], int *user_count, Address addresses[],
       } else if (res == -1) {
         printf("Error: Username already exists.\n");
       } else if (res == -3) {
-        printf("Error: Duplicate Road Assignment! This road is already assigned to another rider.\n");
+        printf("Error: Duplicate Road Assignment! This road is already "
+               "assigned to another rider.\n");
       } else {
         printf("Error: User limit reached.\n");
       }
@@ -154,8 +172,11 @@ void show_user_menu(User users[], int *user_count, Address addresses[],
         clear_screen();
         printf("--- Current Users ---\n");
         display_user_list(users, *user_count, addresses, addr_count);
-        
-        if (!get_validated_int_id("\nEnter User ID to Update (or press Enter/0 to cancel): ", 1, &target_id) || target_id == 0) {
+
+        if (!get_validated_int_id(
+                "\nEnter User ID to Update (or press Enter/0 to cancel): ", 1,
+                &target_id) ||
+            target_id == 0) {
           target_idx = -2;
           break;
         }
@@ -169,17 +190,23 @@ void show_user_menu(User users[], int *user_count, Address addresses[],
           break;
         }
         printf("Error: User ID not found. Press Enter to try again...\n");
-        get_validated_string("", buffer, sizeof(buffer), 0, sizeof(buffer)-1, 0, 1);
+        get_validated_string("", buffer, sizeof(buffer), 0, sizeof(buffer) - 1,
+                             0, 1);
       }
-      if (target_idx == -2 || target_idx == -1) break;
+      if (target_idx == -2 || target_idx == -1)
+        break;
 
       char new_uname[30];
       char prompt_buf[120];
-      snprintf(prompt_buf, sizeof(prompt_buf), "Enter New Username (Current: %s, leave empty to keep): ", users[target_idx].username);
+      snprintf(prompt_buf, sizeof(prompt_buf),
+               "Enter New Username (Current: %s, leave empty to keep): ",
+               users[target_idx].username);
       get_validated_string(prompt_buf, new_uname, 30, 0, 29, 1, 1);
 
       int new_role = -1;
-      snprintf(prompt_buf, sizeof(prompt_buf), "Enter New Role (0: Admin, 1: Rider, or press Enter to keep current %s): ",
+      snprintf(prompt_buf, sizeof(prompt_buf),
+               "Enter New Role (0: Admin, 1: Rider, or press Enter to keep "
+               "current %s): ",
                (users[target_idx].role == ROLE_ADMIN) ? "Admin" : "Rider");
       while (1) {
         get_validated_string(prompt_buf, buffer, sizeof(buffer), 0, 1, 0, 1);
@@ -205,32 +232,40 @@ void show_user_menu(User users[], int *user_count, Address addresses[],
         while (1) {
           clear_screen();
           printf("=== UPDATE ROAD ASSIGNMENT FOR RIDER ===\n");
-          display_address_list_with_riders(addresses, addr_count, users, *user_count);
-          
-          get_validated_string("Enter Address ID to assign (Must be a valid ID from the list, press Enter to keep current, or 0 to cancel): ",
-                               buffer, sizeof(buffer), 0, 10, 0, 1);
-          
+          display_address_list_with_riders(addresses, addr_count, users,
+                                           *user_count);
+
+          get_validated_string(
+              "Enter Address ID to assign (Must be a valid ID from the list, "
+              "press Enter to keep current, or 0 to cancel): ",
+              buffer, sizeof(buffer), 0, 10, 0, 1);
+
           if (strcmp(buffer, "0") == 0) {
             update_cancelled = 1;
             break;
           }
-          
+
           if (strlen(buffer) == 0) {
             if (users[target_idx].assigned_address_id > 0) {
               new_assigned_id = users[target_idx].assigned_address_id;
               break;
             } else {
-              printf("\nError: This user is transitioning to a Rider role and has no current road assignment. You must assign a valid road ID!\n");
+              printf("\nError: This user is transitioning to a Rider role and "
+                     "has no current road assignment. You must assign a valid "
+                     "road ID!\n");
               printf("Press Enter to try again...\n");
-              get_validated_string("", buffer, sizeof(buffer), 0, sizeof(buffer)-1, 0, 1);
+              get_validated_string("", buffer, sizeof(buffer), 0,
+                                   sizeof(buffer) - 1, 0, 1);
               continue;
             }
           }
 
           if (!validate_integer(buffer)) {
-            printf("\nError: Invalid Address ID! Please select a valid ID from the list.\n");
+            printf("\nError: Invalid Address ID! Please select a valid ID from "
+                   "the list.\n");
             printf("Press Enter to try again...\n");
-            get_validated_string("", buffer, sizeof(buffer), 0, sizeof(buffer)-1, 0, 1);
+            get_validated_string("", buffer, sizeof(buffer), 0,
+                                 sizeof(buffer) - 1, 0, 1);
             continue;
           }
 
@@ -238,25 +273,30 @@ void show_user_menu(User users[], int *user_count, Address addresses[],
 
           // 1. Verify it exists in the address list
           if (find_address(addresses, addr_count, new_assigned_id) == NULL) {
-            printf("\nError: Invalid Address ID! Please select a valid ID from the list.\n");
+            printf("\nError: Invalid Address ID! Please select a valid ID from "
+                   "the list.\n");
             printf("Press Enter to try again...\n");
-            get_validated_string("", buffer, sizeof(buffer), 0, sizeof(buffer)-1, 0, 1);
+            get_validated_string("", buffer, sizeof(buffer), 0,
+                                 sizeof(buffer) - 1, 0, 1);
             continue;
           }
 
           // 2. Verify it is not already assigned to another rider
           int road_taken = 0;
           for (int i = 0; i < *user_count; i++) {
-            if (i != target_idx && users[i].role == ROLE_RIDER && users[i].assigned_address_id == new_assigned_id) {
+            if (i != target_idx && users[i].role == ROLE_RIDER &&
+                users[i].assigned_address_id == new_assigned_id) {
               road_taken = 1;
               break;
             }
           }
 
           if (road_taken) {
-            printf("\nError: Duplicate Road Assignment! This road is already assigned to another rider.\n");
+            printf("\nError: Duplicate Road Assignment! This road is already "
+                   "assigned to another rider.\n");
             printf("Press Enter to try again...\n");
-            get_validated_string("", buffer, sizeof(buffer), 0, sizeof(buffer)-1, 0, 1);
+            get_validated_string("", buffer, sizeof(buffer), 0,
+                                 sizeof(buffer) - 1, 0, 1);
             continue;
           }
 
@@ -279,7 +319,8 @@ void show_user_menu(User users[], int *user_count, Address addresses[],
       } else if (update_res == -2) {
         printf("Error: Invalid road assignment for Rider.\n");
       } else if (update_res == -3) {
-        printf("Error: Duplicate Road Assignment! This road is already assigned to another rider.\n");
+        printf("Error: Duplicate Road Assignment! This road is already "
+               "assigned to another rider.\n");
       } else {
         printf("Error: Update failed.\n");
       }
@@ -292,8 +333,11 @@ void show_user_menu(User users[], int *user_count, Address addresses[],
         clear_screen();
         printf("--- Current Users ---\n");
         display_user_list(users, *user_count, addresses, addr_count);
-        
-        if (!get_validated_int_id("\nEnter User ID to Delete (or press Enter/0 to cancel): ", 1, &target_id) || target_id == 0) {
+
+        if (!get_validated_int_id(
+                "\nEnter User ID to Delete (or press Enter/0 to cancel): ", 1,
+                &target_id) ||
+            target_id == 0) {
           res = -999;
           break;
         }
@@ -304,10 +348,12 @@ void show_user_menu(User users[], int *user_count, Address addresses[],
           break;
         } else if (res == -2) {
           printf("Error: Cannot delete Admin. Press Enter to try again...\n");
-          get_validated_string("", buffer, sizeof(buffer), 0, sizeof(buffer)-1, 0, 1);
+          get_validated_string("", buffer, sizeof(buffer), 0,
+                               sizeof(buffer) - 1, 0, 1);
         } else {
           printf("Error: User ID not found. Press Enter to try again...\n");
-          get_validated_string("", buffer, sizeof(buffer), 0, sizeof(buffer)-1, 0, 1);
+          get_validated_string("", buffer, sizeof(buffer), 0,
+                               sizeof(buffer) - 1, 0, 1);
         }
       }
       break;
@@ -316,23 +362,25 @@ void show_user_menu(User users[], int *user_count, Address addresses[],
       return;
     }
     printf("\nPress Enter to continue...");
-    get_validated_string("", buffer, sizeof(buffer), 0, sizeof(buffer)-1, 0, 1);
+    get_validated_string("", buffer, sizeof(buffer), 0, sizeof(buffer) - 1, 0,
+                         1);
   } while (choice != 5);
 }
 
 // --- SUB-MENU: PARCEL MANAGEMENT ---
 /**
  * @brief Displays the sub-menu for parcel management and routes actions.
- * 
+ *
  * Supports viewing, creating, searching, updating status, and deleting parcels.
- * 
+ *
  * @param head Pointer to the head pointer of the parcel list.
  * @param addresses Array of Address structures.
  * @param addr_count Current address count.
  * @param users Array of User structures.
  * @param user_count Current user count.
  */
-void show_parcel_menu(ParcelNode **head, Address addresses[], int addr_count, User users[], int user_count) {
+void show_parcel_menu(ParcelNode **head, Address addresses[], int addr_count,
+                      User users[], int user_count) {
   int choice;
   char buffer[50];
   do {
@@ -364,18 +412,23 @@ void show_parcel_menu(ParcelNode **head, Address addresses[], int addr_count, Us
       get_validated_string("Sender: ", p.sender_name, 50, 1, 49, 0, 0);
       get_validated_string("Receiver: ", p.receiver_name, 50, 1, 49, 0, 0);
       while (1) {
-        display_address_list_with_riders(addresses, addr_count, users, user_count);
-        if (!get_validated_int_id("Enter Address ID (Must be a valid ID from the list): ", 0, &p.address_id)) {
+        display_address_list_with_riders(addresses, addr_count, users,
+                                         user_count);
+        if (!get_validated_int_id(
+                "Enter Address ID (Must be a valid ID from the list): ", 0,
+                &p.address_id)) {
           continue;
         }
         if (find_address(addresses, addr_count, p.address_id) != NULL) {
           break;
         }
         printf("Invalid Address ID! Press Enter to try again...\n");
-        get_validated_string("", buffer, sizeof(buffer), 0, sizeof(buffer)-1, 0, 1);
+        get_validated_string("", buffer, sizeof(buffer), 0, sizeof(buffer) - 1,
+                             0, 1);
       }
       get_validated_int_id("House #: ", 0, &p.house_number);
-      int type_choice = get_validated_choice("Type (1:Fast, 2:Standard): ", 1, 2);
+      int type_choice =
+          get_validated_choice("Type (1:Fast, 2:Standard): ", 1, 2);
       if (type_choice == 1)
         strcpy(p.delivery_type, "Fast");
       else
@@ -389,7 +442,8 @@ void show_parcel_menu(ParcelNode **head, Address addresses[], int addr_count, Us
       Address *addr = find_address(addresses, addr_count, p.address_id);
       char road_str[150] = "Unknown Address";
       if (addr) {
-        snprintf(road_str, sizeof(road_str), "%s, %s, %s", addr->street, addr->city, addr->state);
+        snprintf(road_str, sizeof(road_str), "%s, %s, %s", addr->street,
+                 addr->city, addr->state);
       }
 
       clear_screen();
@@ -410,7 +464,8 @@ void show_parcel_menu(ParcelNode **head, Address addresses[], int addr_count, Us
     } break;
     case 3: {
       clear_screen();
-      int s = get_validated_choice("=== SEARCH ===\n1. By ID\n2. By Receiver\nEnter Choice: ", 1, 2);
+      int s = get_validated_choice(
+          "=== SEARCH ===\n1. By ID\n2. By Receiver\nEnter Choice: ", 1, 2);
       ParcelNode *f = NULL;
       if (s == 1) {
         int search_id = 0;
@@ -418,14 +473,15 @@ void show_parcel_menu(ParcelNode **head, Address addresses[], int addr_count, Us
         f = search_by_id(*head, search_id);
         if (f) {
           clear_screen();
-          display_parcel_detail(&f->data, addresses, addr_count, users, user_count);
+          display_parcel_detail(&f->data, addresses, addr_count, users,
+                                user_count);
         } else {
           printf("Not found.\n");
         }
       } else {
         char search_name[30];
         get_validated_string("Name: ", search_name, 30, 1, 29, 0, 0);
-        
+
         ParcelNode *current = *head;
         int found_any = 0;
         while (current != NULL) {
@@ -435,7 +491,8 @@ void show_parcel_menu(ParcelNode **head, Address addresses[], int addr_count, Us
               clear_screen();
               found_any = 1;
             }
-            display_parcel_detail(&match->data, addresses, addr_count, users, user_count);
+            display_parcel_detail(&match->data, addresses, addr_count, users,
+                                  user_count);
             current = match->next;
           } else {
             break;
@@ -455,64 +512,81 @@ void show_parcel_menu(ParcelNode **head, Address addresses[], int addr_count, Us
         display_active_parcels(*head, addresses, addr_count, users, user_count);
         printf("\n");
 
-        if (!get_validated_int_id("Enter Parcel ID to Update (or press Enter/0 to cancel): ", 1, &id) || id == 0) {
+        if (!get_validated_int_id(
+                "Enter Parcel ID to Update (or press Enter/0 to cancel): ", 1,
+                &id) ||
+            id == 0) {
           n = NULL;
           break;
         }
         n = find_parcel(*head, id);
         if (n != NULL) {
           if (strcmp(n->data.status, "Delivered") == 0) {
-            printf("Error: This parcel has already been delivered and cannot be updated!\n");
+            printf("Error: This parcel has already been delivered and cannot "
+                   "be updated!\n");
             n = NULL;
             printf("Press Enter to try again...\n");
-            get_validated_string("", buffer, sizeof(buffer), 0, sizeof(buffer)-1, 0, 1);
+            get_validated_string("", buffer, sizeof(buffer), 0,
+                                 sizeof(buffer) - 1, 0, 1);
             continue;
           }
           break;
         }
         printf("Error: Parcel ID not found. Press Enter to try again...\n");
-        get_validated_string("", buffer, sizeof(buffer), 0, sizeof(buffer)-1, 0, 1);
+        get_validated_string("", buffer, sizeof(buffer), 0, sizeof(buffer) - 1,
+                             0, 1);
       }
-      if (n == NULL) break;
+      if (n == NULL)
+        break;
 
       char st[20] = "";
       while (1) {
         clear_screen();
         printf("=== UPDATE PARCEL STATUS (ID: %d) ===\n", id);
         display_dynamic_status_options(n->data.status);
-        
+
         int choice_limit = strcmp(n->data.status, "Pending") == 0 ? 2 : 1;
-        
-        get_validated_string("\nEnter Choice (or press Enter/0 to cancel): ", buffer, sizeof(buffer), 0, 10, 0, 1);
+
+        get_validated_string("\nEnter Choice (or press Enter/0 to cancel): ",
+                             buffer, sizeof(buffer), 0, 10, 0, 1);
         if (strlen(buffer) == 0 || strcmp(buffer, "0") == 0) {
           printf("Update cancelled.\n");
           break;
         }
-        
+
         if (!validate_integer(buffer)) {
-          printf("Invalid choice! Choose a valid number or 0 to cancel. Press Enter to try again...\n");
-          get_validated_string("", buffer, sizeof(buffer), 0, sizeof(buffer)-1, 0, 1);
+          printf("Invalid choice! Choose a valid number or 0 to cancel. Press "
+                 "Enter to try again...\n");
+          get_validated_string("", buffer, sizeof(buffer), 0,
+                               sizeof(buffer) - 1, 0, 1);
           continue;
         }
-        
+
         int c = atoi(buffer);
         if (c < 1 || c > choice_limit) {
-          printf("Invalid choice! Choose a number between 1 and %d or 0 to cancel. Press Enter to try again...\n", choice_limit);
-          get_validated_string("", buffer, sizeof(buffer), 0, sizeof(buffer)-1, 0, 1);
+          printf("Invalid choice! Choose a number between 1 and %d or 0 to "
+                 "cancel. Press Enter to try again...\n",
+                 choice_limit);
+          get_validated_string("", buffer, sizeof(buffer), 0,
+                               sizeof(buffer) - 1, 0, 1);
           continue;
         }
 
         if (strcmp(n->data.status, "Pending") == 0) {
-          if (c == 1) strcpy(st, "Out for Delivery");
-          else if (c == 2) strcpy(st, "Delivered");
+          if (c == 1)
+            strcpy(st, "Out for Delivery");
+          else if (c == 2)
+            strcpy(st, "Delivered");
         } else if (strcmp(n->data.status, "Out for Delivery") == 0) {
-          if (c == 1) strcpy(st, "Delivered");
+          if (c == 1)
+            strcpy(st, "Delivered");
         }
 
         if (strcmp(st, "Delivered") == 0) {
           int assigned_rider_id = 0;
           for (int i = 0; i < user_count; i++) {
-            if (users[i].role == ROLE_RIDER && users[i].assigned_address_id == n->data.address_id) {
+            if (users[i].role == ROLE_RIDER &&
+                users[i].assigned_address_id == n->data.address_id) {
               assigned_rider_id = users[i].user_id;
               break;
             }
@@ -527,7 +601,8 @@ void show_parcel_menu(ParcelNode **head, Address addresses[], int addr_count, Us
           break;
         } else {
           printf("Invalid transition. Press Enter to try again...\n");
-          get_validated_string("", buffer, sizeof(buffer), 0, sizeof(buffer)-1, 0, 1);
+          get_validated_string("", buffer, sizeof(buffer), 0,
+                               sizeof(buffer) - 1, 0, 1);
         }
       }
     } break;
@@ -537,9 +612,12 @@ void show_parcel_menu(ParcelNode **head, Address addresses[], int addr_count, Us
         printf("--- All Parcels in System ---\n");
         display_all_parcels(*head, addresses, addr_count, users, user_count);
         printf("\n");
-        
+
         int id = 0;
-        if (!get_validated_int_id("Enter Parcel ID to Delete (or press Enter/0 to cancel): ", 1, &id) || id == 0) {
+        if (!get_validated_int_id(
+                "Enter Parcel ID to Delete (or press Enter/0 to cancel): ", 1,
+                &id) ||
+            id == 0) {
           break;
         }
         if (delete_parcel(head, id)) {
@@ -548,7 +626,8 @@ void show_parcel_menu(ParcelNode **head, Address addresses[], int addr_count, Us
           break;
         } else {
           printf("Error: Parcel not found. Press Enter to try again...\n");
-          get_validated_string("", buffer, sizeof(buffer), 0, sizeof(buffer)-1, 0, 1);
+          get_validated_string("", buffer, sizeof(buffer), 0,
+                               sizeof(buffer) - 1, 0, 1);
         }
       }
       break;
@@ -557,22 +636,24 @@ void show_parcel_menu(ParcelNode **head, Address addresses[], int addr_count, Us
       return;
     }
     printf("\nPress Enter to continue...");
-    get_validated_string("", buffer, sizeof(buffer), 0, sizeof(buffer)-1, 0, 1);
+    get_validated_string("", buffer, sizeof(buffer), 0, sizeof(buffer) - 1, 0,
+                         1);
   } while (choice != 6);
 }
 
 // --- SUB-MENU: ADDRESS MANAGEMENT ---
 /**
  * @brief Displays the address management sub-menu.
- * 
+ *
  * Supports viewing, adding, and updating street addresses.
- * 
+ *
  * @param addresses Array of Address structures.
  * @param addr_count Pointer to the current address count.
  * @param users Array of User structures.
  * @param user_count Current user count.
  */
-void show_address_menu(Address addresses[], int *addr_count, User users[], int user_count) {
+void show_address_menu(Address addresses[], int *addr_count, User users[],
+                       int user_count) {
   int choice;
   char buffer[50];
   do {
@@ -582,18 +663,23 @@ void show_address_menu(Address addresses[], int *addr_count, User users[], int u
     printf("2. Add New Address\n");
     printf("3. Update Address\n");
     printf("4. Return to Main Menu\n");
-    choice = get_validated_choice("Enter Choice 1: ", 1, 4);
+
+    choice = get_validated_choice("Enter Choice: ", 1, 4);
 
     switch (choice) {
     case 1:
       clear_screen();
-      display_address_list_with_riders(addresses, *addr_count, users, user_count);
+      display_address_list_with_riders(addresses, *addr_count, users,
+                                       user_count);
       break;
     case 2: {
       Address a = {0};
-      get_validated_string("Street (e.g. Jalan Ampang / Taman Putri Kulai): ", a.street, 100, 1, 99, 0, 0);
-      get_validated_string("City (e.g. Kuala Lumpur / Kulai): ", a.city, 50, 1, 49, 0, 0);
-      get_validated_string("State (e.g. WP Kuala Lumpur / Johor): ", a.state, 50, 1, 49, 0, 0);
+      get_validated_string("Street (e.g. Jalan Ampang / Taman Putri Kulai): ",
+                           a.street, 100, 1, 99, 0, 0);
+      get_validated_string("City (e.g. Kuala Lumpur / Kulai): ", a.city, 50, 1,
+                           49, 0, 0);
+      get_validated_string("State (e.g. WP Kuala Lumpur / Johor): ", a.state,
+                           50, 1, 49, 0, 0);
       if (add_address(addresses, addr_count, a)) {
         save_addresses_to_file(addresses, *addr_count, "dataset/addresses.csv");
         clear_screen();
@@ -613,19 +699,24 @@ void show_address_menu(Address addresses[], int *addr_count, User users[], int u
       while (1) {
         clear_screen();
         printf("--- Current Addresses ---\n");
-        display_address_list_with_riders(addresses, *addr_count, users, user_count);
+        display_address_list_with_riders(addresses, *addr_count, users,
+                                         user_count);
         printf("\n");
         int id = 0;
-        if (!get_validated_int_id("ID to Update (or press Enter/0 to cancel): ", 1, &id) || id == 0) {
+        if (!get_validated_int_id(
+                "ID to Update (or press Enter/0 to cancel): ", 1, &id) ||
+            id == 0) {
           break;
         }
         if (update_address(addresses, *addr_count, id)) {
-          save_addresses_to_file(addresses, *addr_count, "dataset/addresses.csv");
+          save_addresses_to_file(addresses, *addr_count,
+                                 "dataset/addresses.csv");
           printf("Updated successfully.\n");
           break;
         } else {
           printf("Error: Address ID not found. Press Enter to try again...\n");
-          get_validated_string("", buffer, sizeof(buffer), 0, sizeof(buffer)-1, 0, 1);
+          get_validated_string("", buffer, sizeof(buffer), 0,
+                               sizeof(buffer) - 1, 0, 1);
         }
       }
       break;
@@ -634,21 +725,23 @@ void show_address_menu(Address addresses[], int *addr_count, User users[], int u
       return;
     }
     printf("\nPress Enter to continue...");
-    get_validated_string("", buffer, sizeof(buffer), 0, sizeof(buffer)-1, 0, 1);
+    get_validated_string("", buffer, sizeof(buffer), 0, sizeof(buffer) - 1, 0,
+                         1);
   } while (choice != 4);
 }
 
 // --- SUB-MENU: REPORTS ---
 /**
  * @brief Displays the report selection menu and prints summaries/commissions.
- * 
+ *
  * @param head Pointer to the parcel linked list.
  * @param addresses Array of Address structures.
  * @param addr_count Current address count.
  * @param users Array of User structures.
  * @param user_count Current user count.
  */
-void show_report_menu(ParcelNode *head, Address addresses[], int addr_count, User users[], int user_count) {
+void show_report_menu(ParcelNode *head, Address addresses[], int addr_count,
+                      User users[], int user_count) {
   int choice;
   char buffer[10];
   do {
@@ -673,22 +766,24 @@ void show_report_menu(ParcelNode *head, Address addresses[], int addr_count, Use
     } break;
     case 3:
       clear_screen();
-      display_all_riders_commission_report(head, users, user_count, addresses, addr_count);
+      display_all_riders_commission_report(head, users, user_count, addresses,
+                                           addr_count);
       break;
     case 4:
       return;
     }
     printf("\nPress Enter to continue...");
-    get_validated_string("", buffer, sizeof(buffer), 0, sizeof(buffer)-1, 0, 1);
+    get_validated_string("", buffer, sizeof(buffer), 0, sizeof(buffer) - 1, 0,
+                         1);
   } while (choice != 4);
 }
 
 // --- MAIN ADMIN MENU ---
 /**
  * @brief Entry point for the Admin console interface.
- * 
+ *
  * Routes user choices to specific sub-menus.
- * 
+ *
  * @param head Pointer to the head pointer of the parcel list.
  * @param users Array of User structures.
  * @param user_count Pointer to the current user count.
@@ -730,10 +825,11 @@ void show_admin_main_menu(ParcelNode **head, User users[], int *user_count,
 
 /**
  * @brief Entry point for the Rider console interface.
- * 
+ *
  * Provides access to Rider-specific workflows: viewing assigned parcels,
- * updating status for parcels on their assigned road, and viewing their commission.
- * 
+ * updating status for parcels on their assigned road, and viewing their
+ * commission.
+ *
  * @param head Pointer to the head pointer of the parcel list.
  * @param user_idx Array index of the logged-in Rider user.
  * @param users Array of User structures.
@@ -741,8 +837,8 @@ void show_admin_main_menu(ParcelNode **head, User users[], int *user_count,
  * @param addresses Array of Address structures.
  * @param addr_count Current address count.
  */
-void show_rider_menu(ParcelNode **head, int user_idx, User users[], int user_count,
-                     Address addresses[], int addr_count) {
+void show_rider_menu(ParcelNode **head, int user_idx, User users[],
+                     int user_count, Address addresses[], int addr_count) {
   int choice;
   char buffer[10];
 
@@ -771,12 +867,14 @@ void show_rider_menu(ParcelNode **head, int user_idx, User users[], int user_cou
     switch (choice) {
     case 1:
       clear_screen();
-      display_rider_parcels(*head, assigned_road_id, addresses, addr_count, users, user_count);
+      display_rider_parcels(*head, assigned_road_id, addresses, addr_count,
+                            users, user_count);
       break;
     case 2: {
       clear_screen();
       ParcelNode *sorted = generate_sorted_queue(*head);
-      display_rider_sorted_parcels(sorted, assigned_road_id, addresses, addr_count, users, user_count);
+      display_rider_sorted_parcels(sorted, assigned_road_id, addresses,
+                                   addr_count, users, user_count);
       free_sorted_queue(&sorted);
     } break;
     case 3: {
@@ -785,68 +883,86 @@ void show_rider_menu(ParcelNode **head, int user_idx, User users[], int user_cou
       while (1) {
         clear_screen();
         printf("--- Your Assigned Active Road Parcels ---\n");
-        display_rider_active_parcels(*head, assigned_road_id, addresses, addr_count, users, user_count);
+        display_rider_active_parcels(*head, assigned_road_id, addresses,
+                                     addr_count, users, user_count);
         printf("\n");
 
-        if (!get_validated_int_id("Parcel ID to Update (or press Enter/0 to cancel): ", 1, &id) || id == 0) {
+        if (!get_validated_int_id(
+                "Parcel ID to Update (or press Enter/0 to cancel): ", 1, &id) ||
+            id == 0) {
           n = NULL;
           break;
         }
         n = find_parcel(*head, id);
         if (n != NULL) {
           if (n->data.address_id != assigned_road_id) {
-            printf("Error: Access Denied. You can only update parcels assigned to your road!\n");
+            printf("Error: Access Denied. You can only update parcels assigned "
+                   "to your road!\n");
             n = NULL;
             printf("Press Enter to try again...\n");
-            get_validated_string("", buffer, sizeof(buffer), 0, sizeof(buffer)-1, 0, 1);
+            get_validated_string("", buffer, sizeof(buffer), 0,
+                                 sizeof(buffer) - 1, 0, 1);
             continue;
           }
           if (strcmp(n->data.status, "Delivered") == 0) {
-            printf("Error: This parcel has already been delivered and cannot be updated!\n");
+            printf("Error: This parcel has already been delivered and cannot "
+                   "be updated!\n");
             n = NULL;
             printf("Press Enter to try again...\n");
-            get_validated_string("", buffer, sizeof(buffer), 0, sizeof(buffer)-1, 0, 1);
+            get_validated_string("", buffer, sizeof(buffer), 0,
+                                 sizeof(buffer) - 1, 0, 1);
             continue;
           }
           break; // Valid road match and not delivered!
         }
         printf("Error: Parcel ID not found. Press Enter to try again...\n");
-        get_validated_string("", buffer, sizeof(buffer), 0, sizeof(buffer)-1, 0, 1);
+        get_validated_string("", buffer, sizeof(buffer), 0, sizeof(buffer) - 1,
+                             0, 1);
       }
-      if (n == NULL) break;
+      if (n == NULL)
+        break;
 
       char st[20] = "";
       while (1) {
         clear_screen();
         printf("=== UPDATE PARCEL STATUS (ID: %d) ===\n", id);
         display_dynamic_status_options(n->data.status);
-        
+
         int choice_limit = strcmp(n->data.status, "Pending") == 0 ? 2 : 1;
-        
-        get_validated_string("\nEnter Choice (or press Enter/0 to cancel): ", buffer, sizeof(buffer), 0, 10, 0, 1);
+
+        get_validated_string("\nEnter Choice (or press Enter/0 to cancel): ",
+                             buffer, sizeof(buffer), 0, 10, 0, 1);
         if (strlen(buffer) == 0 || strcmp(buffer, "0") == 0) {
           printf("Update cancelled.\n");
           break;
         }
-        
+
         if (!validate_integer(buffer)) {
-          printf("Invalid choice! Choose a valid number or 0 to cancel. Press Enter to try again...\n");
-          get_validated_string("", buffer, sizeof(buffer), 0, sizeof(buffer)-1, 0, 1);
+          printf("Invalid choice! Choose a valid number or 0 to cancel. Press "
+                 "Enter to try again...\n");
+          get_validated_string("", buffer, sizeof(buffer), 0,
+                               sizeof(buffer) - 1, 0, 1);
           continue;
         }
-        
+
         int c = atoi(buffer);
         if (c < 1 || c > choice_limit) {
-          printf("Invalid choice! Choose a number between 1 and %d or 0 to cancel. Press Enter to try again...\n", choice_limit);
-          get_validated_string("", buffer, sizeof(buffer), 0, sizeof(buffer)-1, 0, 1);
+          printf("Invalid choice! Choose a number between 1 and %d or 0 to "
+                 "cancel. Press Enter to try again...\n",
+                 choice_limit);
+          get_validated_string("", buffer, sizeof(buffer), 0,
+                               sizeof(buffer) - 1, 0, 1);
           continue;
         }
 
         if (strcmp(n->data.status, "Pending") == 0) {
-          if (c == 1) strcpy(st, "Out for Delivery");
-          else if (c == 2) strcpy(st, "Delivered");
+          if (c == 1)
+            strcpy(st, "Out for Delivery");
+          else if (c == 2)
+            strcpy(st, "Delivered");
         } else if (strcmp(n->data.status, "Out for Delivery") == 0) {
-          if (c == 1) strcpy(st, "Delivered");
+          if (c == 1)
+            strcpy(st, "Delivered");
         }
 
         if (strcmp(st, "Delivered") == 0) {
@@ -860,28 +976,32 @@ void show_rider_menu(ParcelNode **head, int user_idx, User users[], int user_cou
           break;
         } else {
           printf("Invalid transition. Press Enter to try again...\n");
-          get_validated_string("", buffer, sizeof(buffer), 0, sizeof(buffer)-1, 0, 1);
+          get_validated_string("", buffer, sizeof(buffer), 0,
+                               sizeof(buffer) - 1, 0, 1);
         }
       }
     } break;
     case 4:
       clear_screen();
-      display_rider_commission(*head, users, user_count, addresses, addr_count, user_idx);
+      display_rider_commission(*head, users, user_count, addresses, addr_count,
+                               user_idx);
       break;
     case 5:
       return;
     }
     printf("\nPress Enter to continue...");
-    get_validated_string("", buffer, sizeof(buffer), 0, sizeof(buffer)-1, 0, 1);
+    get_validated_string("", buffer, sizeof(buffer), 0, sizeof(buffer) - 1, 0,
+                         1);
   } while (choice != 5);
 }
 
 /**
  * @brief Main entry point of the Parcel Sorting system.
- * 
- * Initializes the database (loads from CSV or defaults to mock), runs the login loop,
- * routes authenticated users to their corresponding roles, and saves on exit.
- * 
+ *
+ * Initializes the database (loads from CSV or defaults to mock), runs the login
+ * loop, routes authenticated users to their corresponding roles, and saves on
+ * exit.
+ *
  * @return int 0 on clean exit.
  */
 int main() {
@@ -893,12 +1013,15 @@ int main() {
 
   // Try to load from CSV dataset
   user_count = load_users(users, MAX_USERS, "dataset/users.csv");
-  addr_count = load_addresses(addresses, MAX_ADDRESSES, "dataset/addresses.csv");
+  addr_count =
+      load_addresses(addresses, MAX_ADDRESSES, "dataset/addresses.csv");
   int parcel_count = load_parcels_from_file(&head, "dataset/parcels.csv");
 
   if (user_count == 0 || addr_count == 0) {
-    printf("Error: CSV database files (users.csv or addresses.csv) not found or empty.\n");
-    printf("Please make sure dataset/users.csv and dataset/addresses.csv exist and contain valid data.\n");
+    printf("Error: CSV database files (users.csv or addresses.csv) not found "
+           "or empty.\n");
+    printf("Please make sure dataset/users.csv and dataset/addresses.csv exist "
+           "and contain valid data.\n");
     free_all_parcels(&head);
     return 1;
   }
@@ -909,8 +1032,7 @@ int main() {
   printf("  - Parcels: %d\n", parcel_count);
   printf("\nPress Enter to start...");
   char temp[10];
-  get_validated_string("", temp, sizeof(temp), 0, sizeof(temp)-1, 0, 1);
-
+  get_validated_string("", temp, sizeof(temp), 0, sizeof(temp) - 1, 0, 1);
 
   while (1) {
     int user_idx = login(users, user_count);
@@ -921,7 +1043,8 @@ int main() {
     if (role == ROLE_ADMIN) {
       show_admin_main_menu(&head, users, &user_count, addresses, &addr_count);
     } else if (role == ROLE_RIDER) {
-      show_rider_menu(&head, user_idx, users, user_count, addresses, addr_count);
+      show_rider_menu(&head, user_idx, users, user_count, addresses,
+                      addr_count);
     }
   }
 
