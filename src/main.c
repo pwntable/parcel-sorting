@@ -582,8 +582,6 @@ void show_address_menu(Address addresses[], int *addr_count, User users[], int u
     printf("2. Add New Address\n");
     printf("3. Update Address\n");
     printf("4. Return to Main Menu\n");
-    printf("Enter Choice: ");
-
     choice = get_validated_choice("Enter Choice: ", 1, 4);
 
     switch (choice) {
