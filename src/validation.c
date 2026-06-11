@@ -100,6 +100,71 @@ int validate_alphanumeric(const char *input) {
 }
 
 /**
+ * @brief Validates if a string contains only alphabetic characters and spaces.
+ * 
+ * @param input The string to validate.
+ * @return int 1 if alphabetic/space, 0 otherwise.
+ */
+int validate_alpha_space(const char *input) {
+    if (!input || *input == '\0') return 0;
+    while (*input) {
+        if (!isalpha((unsigned char)*input) && !isspace((unsigned char)*input)) return 0;
+        input++;
+    }
+    return 1;
+}
+
+/**
+ * @brief Validates an address field. Must contain at least one alphabetic word.
+ * If the only alphabetic word is "jalan", it requires another alphabetic word.
+ * 
+ * @param input The string to validate.
+ * @return int 1 if valid, 0 otherwise.
+ */
+int validate_address_field(const char *input) {
+    if (!input || *input == '\0') return 0;
+    
+    int alpha_word_count = 0;
+    int is_jalan_only = 1;
+    
+    const char *p = input;
+    while (*p) {
+        while (*p && !isalpha((unsigned char)*p)) {
+            p++;
+        }
+        
+        if (*p) {
+            alpha_word_count++;
+            const char *start = p;
+            int len = 0;
+            while (*p && isalpha((unsigned char)*p)) {
+                len++;
+                p++;
+            }
+            
+            int is_jalan = 0;
+            if (len == 5 &&
+                tolower((unsigned char)start[0]) == 'j' &&
+                tolower((unsigned char)start[1]) == 'a' &&
+                tolower((unsigned char)start[2]) == 'l' &&
+                tolower((unsigned char)start[3]) == 'a' &&
+                tolower((unsigned char)start[4]) == 'n') {
+                is_jalan = 1;
+            }
+            
+            if (!is_jalan) {
+                is_jalan_only = 0;
+            }
+        }
+    }
+    
+    if (alpha_word_count == 0) return 0; 
+    if (alpha_word_count == 1 && is_jalan_only) return 0; 
+    
+    return 1;
+}
+
+/**
  * @brief Parses the first sequence of numbers encountered in a string.
  * 
  * Useful for scanning scan-codes or barcode IDs containing prefixes (e.g. "*P-0001*").
@@ -184,6 +249,92 @@ int get_validated_string(const char *prompt, char *dest, int dest_size, int min_
         }
         if (is_alphanumeric && !validate_alphanumeric(buffer)) {
             printf("Input must contain only letters and numbers (alphanumeric).\n");
+            continue;
+        }
+        
+        strncpy(dest, buffer, dest_size - 1);
+        dest[dest_size - 1] = '\0';
+        return 1;
+    }
+}
+
+/**
+ * @brief Prompts user for a string input with rules on length, alphabetical characters + spaces, and emptiness.
+ * 
+ * @param prompt Prompt string.
+ * @param dest Output character array to copy input to.
+ * @param dest_size Size of destination array.
+ * @param min_len Minimum length of string.
+ * @param max_len Maximum length of string.
+ * @param allow_empty If 1, user can press Enter to submit empty string.
+ * @return int Returns 1.
+ */
+int get_validated_alpha_string(const char *prompt, char *dest, int dest_size, int min_len, int max_len, int allow_empty) {
+    char buffer[512];
+    while (1) {
+        printf("%s", prompt);
+        if (!safe_read_string(buffer, sizeof(buffer))) {
+            continue;
+        }
+        trim_whitespace(buffer);
+        int len = strlen(buffer);
+        if (len == 0) {
+            if (allow_empty) {
+                dest[0] = '\0';
+                return 1;
+            }
+            printf("Input cannot be empty.\n");
+            continue;
+        }
+        if (!validate_string_length(buffer, min_len, max_len)) {
+            printf("Input length must be between %d and %d characters.\n", min_len, max_len);
+            continue;
+        }
+        if (!validate_alpha_space(buffer)) {
+            printf("Input must contain only letters and spaces.\n");
+            continue;
+        }
+        
+        strncpy(dest, buffer, dest_size - 1);
+        dest[dest_size - 1] = '\0';
+        return 1;
+    }
+}
+
+/**
+ * @brief Prompts user for a string input and ensures it's a valid address field.
+ * 
+ * @param prompt Prompt string.
+ * @param dest Output character array to copy input to.
+ * @param dest_size Size of destination array.
+ * @param min_len Minimum length of string.
+ * @param max_len Maximum length of string.
+ * @param allow_empty If 1, user can press Enter to submit empty string.
+ * @return int Returns 1.
+ */
+int get_validated_address_string(const char *prompt, char *dest, int dest_size, int min_len, int max_len, int allow_empty) {
+    char buffer[512];
+    while (1) {
+        printf("%s", prompt);
+        if (!safe_read_string(buffer, sizeof(buffer))) {
+            continue;
+        }
+        trim_whitespace(buffer);
+        int len = strlen(buffer);
+        if (len == 0) {
+            if (allow_empty) {
+                dest[0] = '\0';
+                return 1;
+            }
+            printf("Input cannot be empty.\n");
+            continue;
+        }
+        if (!validate_string_length(buffer, min_len, max_len)) {
+            printf("Input length must be between %d and %d characters.\n", min_len, max_len);
+            continue;
+        }
+        if (!validate_address_field(buffer)) {
+            printf("Address must contain at least one valid word (e.g., 'jalan' alone is not enough or cannot be pure numbers).\n");
             continue;
         }
         

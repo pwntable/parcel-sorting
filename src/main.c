@@ -409,24 +409,62 @@ void show_parcel_menu(ParcelNode **head, Address addresses[], int addr_count,
       }
       Parcel p = {0};
       p.parcel_id = get_next_parcel_id(*head);
-      get_validated_string("Sender: ", p.sender_name, 50, 1, 49, 0, 0);
-      get_validated_string("Receiver: ", p.receiver_name, 50, 1, 49, 0, 0);
+      int cancel_flag = 0;
+      get_validated_alpha_string("Sender (or press Enter to cancel): ", p.sender_name, 50, 1, 49, 1);
+      if (strlen(p.sender_name) == 0) {
+          printf("\nParcel creation cancelled.\n");
+          break;
+      }
+      
+      get_validated_alpha_string("Receiver (or press Enter to cancel): ", p.receiver_name, 50, 1, 49, 1);
+      if (strlen(p.receiver_name) == 0) {
+          printf("\nParcel creation cancelled.\n");
+          break;
+      }
+      
       while (1) {
         display_address_list_with_riders(addresses, addr_count, users,
                                          user_count);
         if (!get_validated_int_id(
-                "Enter Address ID (Must be a valid ID from the list): ", 0,
-                &p.address_id)) {
-          continue;
-        }
-        if (find_address(addresses, addr_count, p.address_id) != NULL) {
+                "Enter Address ID (Must be a valid ID from the list, or 0/Enter to cancel): ", 1,
+                &p.address_id) || p.address_id == 0) {
+          cancel_flag = 1;
           break;
         }
-        printf("Invalid Address ID! Press Enter to try again...\n");
-        get_validated_string("", buffer, sizeof(buffer), 0, sizeof(buffer) - 1,
-                             0, 1);
+        if (find_address(addresses, addr_count, p.address_id) == NULL) {
+          printf("Invalid Address ID! Press Enter to try again...\n");
+          get_validated_string("", buffer, sizeof(buffer), 0, sizeof(buffer) - 1,
+                               0, 1);
+          continue;
+        }
+        
+        int rider_assigned = 0;
+        for (int i = 0; i < user_count; i++) {
+          if (users[i].role == ROLE_RIDER && users[i].assigned_address_id == p.address_id) {
+            rider_assigned = 1;
+            break;
+          }
+        }
+        
+        if (!rider_assigned) {
+          printf("Error: Cannot assign to this address because there is no Rider assigned to it.\n");
+          printf("Press Enter to try again...\n");
+          get_validated_string("", buffer, sizeof(buffer), 0, sizeof(buffer) - 1, 0, 1);
+          continue;
+        }
+        
+        break;
       }
-      get_validated_int_id("House #: ", 0, &p.house_number);
+      
+      if (cancel_flag) {
+          printf("\nParcel creation cancelled.\n");
+          break;
+      }
+      
+      if (!get_validated_int_id("House # (or 0/Enter to cancel): ", 1, &p.house_number) || p.house_number == 0) {
+          printf("\nParcel creation cancelled.\n");
+          break;
+      }
       int type_choice =
           get_validated_choice("Type (1:Fast, 2:Standard): ", 1, 2);
       if (type_choice == 1)
@@ -465,11 +503,18 @@ void show_parcel_menu(ParcelNode **head, Address addresses[], int addr_count,
     case 3: {
       clear_screen();
       int s = get_validated_choice(
-          "=== SEARCH ===\n1. By ID\n2. By Receiver\nEnter Choice: ", 1, 2);
+          "=== SEARCH ===\n1. By ID\n2. By Receiver\n3. Cancel\nEnter Choice: ", 1, 3);
+      if (s == 3) {
+          printf("\nSearch cancelled.\n");
+          break;
+      }
       ParcelNode *f = NULL;
       if (s == 1) {
         int search_id = 0;
-        get_validated_int_id("ID: ", 0, &search_id);
+        if (!get_validated_int_id("ID (or 0/Enter to cancel): ", 1, &search_id) || search_id == 0) {
+            printf("\nSearch cancelled.\n");
+            break;
+        }
         f = search_by_id(*head, search_id);
         if (f) {
           clear_screen();
@@ -480,7 +525,11 @@ void show_parcel_menu(ParcelNode **head, Address addresses[], int addr_count,
         }
       } else {
         char search_name[30];
-        get_validated_string("Name: ", search_name, 30, 1, 29, 0, 0);
+        get_validated_string("Name (or press Enter to cancel): ", search_name, 30, 1, 29, 0, 1);
+        if (strlen(search_name) == 0) {
+            printf("\nSearch cancelled.\n");
+            break;
+        }
 
         ParcelNode *current = *head;
         int found_any = 0;
@@ -674,12 +723,24 @@ void show_address_menu(Address addresses[], int *addr_count, User users[],
       break;
     case 2: {
       Address a = {0};
-      get_validated_string("Street (e.g. Jalan Ampang / Taman Putri Kulai): ",
-                           a.street, 100, 1, 99, 0, 0);
-      get_validated_string("City (e.g. Kuala Lumpur / Kulai): ", a.city, 50, 1,
-                           49, 0, 0);
-      get_validated_string("State (e.g. WP Kuala Lumpur / Johor): ", a.state,
-                           50, 1, 49, 0, 0);
+      get_validated_address_string("Street (e.g. Jalan Ampang / Taman Putri Kulai, or press Enter to cancel): ",
+                           a.street, 100, 1, 99, 1);
+      if (strlen(a.street) == 0) {
+          printf("\nAddress creation cancelled.\n");
+          break;
+      }
+      get_validated_address_string("City (e.g. Kuala Lumpur / Kulai, or press Enter to cancel): ", a.city, 50, 1,
+                           49, 1);
+      if (strlen(a.city) == 0) {
+          printf("\nAddress creation cancelled.\n");
+          break;
+      }
+      get_validated_address_string("State (e.g. WP Kuala Lumpur / Johor, or press Enter to cancel): ", a.state,
+                           50, 1, 49, 1);
+      if (strlen(a.state) == 0) {
+          printf("\nAddress creation cancelled.\n");
+          break;
+      }
       if (add_address(addresses, addr_count, a)) {
         save_addresses_to_file(addresses, *addr_count, "dataset/addresses.csv");
         clear_screen();
